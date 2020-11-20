@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="700.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+   <children>
+      <GridPane prefHeight="700.0" prefWidth="700.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="550.0" minWidth="550.0" prefWidth="550.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints maxHeight="120.0" minHeight="120.0" prefHeight="120.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <children>
+                  <TextField fx:id="inputField" depthTest="DISABLE" editable="false" mouseTransparent="true" pickOnBounds="false" prefHeight="30.0" prefWidth="310.0" promptText="Input Path">
+                     <FlowPane.margin>
+                        <Insets />
+                     </FlowPane.margin>
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </TextField>
+                  <Button fx:id="inputFolderBTN" mnemonicParsing="false" onMouseClicked="#onInputFolderBTN" prefHeight="30.0" prefWidth="100.0" stylesheets="@style.css" text="Import Folder">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <FlowPane.margin>
+                        <Insets left="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button fx:id="inputImagesBTN" mnemonicParsing="false" onMouseClicked="#onInputImagesBTN" prefHeight="30.0" prefWidth="100.0" text="Import Images">
+                     <FlowPane.margin>
+                        <Insets left="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+               </children>
+            </FlowPane>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+               <children>
+                  <TextField fx:id="outputField" depthTest="DISABLE" editable="false" mouseTransparent="true" pickOnBounds="false" prefHeight="30.0" prefWidth="380.0" promptText="Output Path">
+                     <FlowPane.margin>
+                        <Insets />
+                     </FlowPane.margin>
+                  </TextField>
+                  <Button fx:id="outputBTN" mnemonicParsing="false" onMouseClicked="#onOutputBTN" prefHeight="30.0" prefWidth="150.0" text="Browse Output Location">
+                     <FlowPane.margin>
+                        <Insets left="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+               </children>
+            </FlowPane>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+               <children>
+                  <TextField fx:id="nameField" prefHeight="30.0" prefWidth="300.0" promptText="File Name">
+                     <FlowPane.margin>
+                        <Insets left="125.0" />
+                     </FlowPane.margin>
+                  </TextField>
+               </children>
+            </FlowPane>
+            <Separator GridPane.columnIndex="1" GridPane.rowIndex="7">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </Separator>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <children>
+                  <Text fx:id="title" strokeType="OUTSIDE" strokeWidth="10.0" text="Stitch ❤" textAlignment="CENTER" wrappingWidth="550.0">
+                     <font>
+                        <Font name="Century Gothic" size="54.0" />
+                     </font>
+                     <FlowPane.margin>
+                        <Insets top="25.0" />
+                     </FlowPane.margin>
+                     <fill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop color="WHITE" />
+                              <Stop color="WHITE" offset="1.0" />
+                           </stops>
+                        </LinearGradient>
+                     </fill>
+                  </Text>
+               </children>
+            </FlowPane>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+               <children>
+                  <RadioButton fx:id="stitchVert" mnemonicParsing="false" onMouseClicked="#onStitchVert" selected="true" text="Stitch Vertically" textFill="WHITE">
+                     <FlowPane.margin>
+                        <Insets right="8.333" top="20.0" />
+                     </FlowPane.margin>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="action" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="stitchHor" mnemonicParsing="false" onMouseClicked="#onStitchHor" text="Stitch Horizontally" textFill="WHITE" toggleGroup="$action">
+                     <FlowPane.margin>
+                        <Insets right="8.333" top="20.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="splitHor" mnemonicParsing="false" onMouseClicked="#onSplitHor" text="Split Horiztonally" textFill="WHITE" toggleGroup="$action">
+                     <FlowPane.margin>
+                        <Insets right="8.333" top="20.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="splitVert" mnemonicParsing="false" onMouseClicked="#onSplitVert" text="Split Vertically" textFill="WHITE" toggleGroup="$action">
+                     <FlowPane.margin>
+                        <Insets top="20.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+               </children>
+            </FlowPane>
+            <Separator GridPane.columnIndex="1" GridPane.rowIndex="9">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets></Separator>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+               <children>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Opacity %">
+                     <FlowPane.margin>
+                        <Insets />
+                     </FlowPane.margin>
+                  </Text>
+                  <Slider fx:id="opacitySlider" blockIncrement="0.0" majorTickUnit="10.0" minorTickCount="0" prefHeight="38.0" prefWidth="251.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="40.0">
+                     <FlowPane.margin>
+                        <Insets right="20.0" top="20.0" />
+                     </FlowPane.margin>
+                  </Slider>
+                  <CheckBox fx:id="greyOption" mnemonicParsing="false" text="Greyscale?" textFill="WHITE">
+                     <FlowPane.margin>
+                        <Insets right="20.0" top="5.0" />
+                     </FlowPane.margin></CheckBox>
+                  <Button fx:id="watermarkBTN" mnemonicParsing="false" onMouseClicked="#onWatermarkBTN" text="Add Watermark">
+                     <FlowPane.margin>
+                        <Insets top="5.0" />
+                     </FlowPane.margin>
+                  </Button>
+               </children>
+            </FlowPane>
+            <Separator GridPane.columnIndex="1" GridPane.rowIndex="11" />
+            <Button fx:id="runBTN" mnemonicParsing="false" onMouseClicked="#onRunBTN" prefWidth="70.0" text="Run" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="12">
+               <padding>
+                  <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+               </padding>
+               <GridPane.margin>
+                  <Insets left="240.0" />
+               </GridPane.margin>
+            </Button>
+         </children>
+      </GridPane>
+   </children>
+</VBox>

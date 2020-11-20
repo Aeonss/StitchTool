@@ -1,0 +1,91 @@
+.root {
+/*
+    -fx-background-image: url("background.png");
+*/
+    -fx-background-color: #191919;
+}
+
+#title{
+    -fx-font-weight: 200;
+}
+
+#inputField:focused{
+    -fx-prompt-text-fill: #a9a9a9;
+}
+
+.text-field{
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #3498db;
+    -fx-prompt-text-fill: #a9a9a9;
+    -fx-border-radius: 24;
+    -fx-padding: 0 0 0 20;
+    -fx-text-fill: white;
+}
+
+.button{
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #1abc9c;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+}
+
+.button:hover{
+    -fx-border-color: #1abc9c;
+    -fx-background-radius: 24;
+    -fx-background-color: #1abc9c;
+}
+
+#nameField{
+    -fx-border-color: #e74c3c;
+}
+
+#nameField:focused{
+    -fx-padding: 0 0 0 -105;
+    -fx-border-insets: 0 0 0 -125;
+    -fx-background-insets: 0 0 0 -125;
+    -fx-pref-width: 425;
+}
+
+.radio-button{
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #9b59b6;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+    -fx-padding: 5 10 5 10;
+}
+
+.slider .axis {
+    -fx-tick-label-fill: white;
+}
+
+#greyOption{
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #f1c40f;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+    -fx-padding: 5 10 5 10;
+}
+
+#watermarkBTN{
+    -fx-border-color: #f1c40f;
+}
+
+#watermarkBTN:hover{
+    -fx-border-color: #f1c40f;
+    -fx-background-radius: 24;
+    -fx-background-color: #f1c40f;
+}
+
+#runBTN {
+    -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
+}
+
+#runBTN:hover{
+    -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
+    -fx-background-radius: 24;
+    -fx-background-color: linear-gradient(to top left, #ff7f50, #6a5acd);
+}
