@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Properties;
 
 public class Stitch extends Application {
-    private final String version = "1.0";
+    private final String version = "1.2";
 
     @Override
     public void start(Stage window) throws Exception{
@@ -65,7 +65,7 @@ public class Stitch extends Application {
             Alert a = new Alert(Alert.AlertType.CONFIRMATION);
             a.setHeaderText(null);
             a.setTitle("Update Available!");
-            a.setContentText("A new version of Azathoth v" + latestVersion + " is available for download. \nWould you like to visit the website to download it?");
+            a.setContentText("A new version of StitchTool v" + latestVersion + " is available for download. \nWould you like to visit the website to download it?");
             a.showAndWait();
             if (a.getResult().getText().equals("OK")) {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
