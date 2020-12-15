@@ -476,7 +476,9 @@ public class Controller implements Initializable {
                 a.showAndWait();
             } else {
                 // Creates a preview of the window
-                previewImage(frame, source, num);
+                try {
+                    previewImage(frame, source, num);
+                } catch (Exception e) { }
 
                 Alert a = new Alert(Alert.AlertType.CONFIRMATION);
                 a.setHeaderText(null);
