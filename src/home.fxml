@@ -36,7 +36,7 @@
             <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="70.0" minHeight="120.0" prefHeight="120.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
@@ -137,6 +137,11 @@
                      </FlowPane.margin>
                   </RadioButton>
                   <RadioButton fx:id="splitVert" mnemonicParsing="false" onMouseClicked="#onSplitVert" text="Split Vertically" textFill="WHITE" toggleGroup="$action">
+                     <FlowPane.margin>
+                        <Insets top="20.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="smartSplit" mnemonicParsing="false" onMouseClicked="#onSmartSplit" text="Smart Split" textFill="WHITE" toggleGroup="$action">
                      <FlowPane.margin>
                         <Insets top="20.0" />
                      </FlowPane.margin>

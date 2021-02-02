@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Properties;
 
 public class Stitch extends Application {
-    private final String version = "1.2";
+    private final String version = "1.3";
 
     @Override
     public void start(Stage window) throws Exception{
@@ -40,7 +40,7 @@ public class Stitch extends Application {
         launch(args);
     }
 
-    // Checks the latest GitHub releases to see if there's a updated version of Azathoth
+    // Checks the latest GitHub releases to see if there's a updated version of StitchTool
     public void checkVersion() throws IOException {
         // Connects to the latest repository API
         URL url = new URL("https://api.github.com/repos/xAgramon/StitchTool/releases/latest");
@@ -97,10 +97,10 @@ public class Stitch extends Application {
         i.close();
 
         OutputStream o = new FileOutputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
-        p.setProperty("inputPath", System.getProperty("user.home") + "\\");
-        p.setProperty("outputPath", System.getProperty("user.home") + "\\");
-        p.setProperty("imagePath", System.getProperty("user.home") + "\\");
-        p.setProperty("watermarkPath", System.getProperty("user.home") + "\\");
+        p.setProperty("inputPath", System.getProperty("user.home") + File.separator);
+        p.setProperty("outputPath", System.getProperty("user.home") + File.separator);
+        p.setProperty("imagePath", System.getProperty("user.home") + File.separator);
+        p.setProperty("watermarkPath", System.getProperty("user.home") + File.separator);
 
         p.store(o, null);
         o.close();
