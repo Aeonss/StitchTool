@@ -66,7 +66,7 @@ an off-white or black background.
 ## Additional Information
 
 * Java 14 or above is needed to run this!
-https://www.oracle.com/java/technologies/javase-jdk14-downloads.html
+  https://jdk.java.net/archive/
 
 * StitchTool will stitch together images that are named in alphanumerical order.
 

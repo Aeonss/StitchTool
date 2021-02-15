@@ -660,7 +660,7 @@ public class Controller implements Initializable {
         for (int i = 0; i < splitHeights.size() - 1; i++) {
             //System.out.println("height: " + source.getHeight() + " from: " + splitHeights.get(i) + " to: " + splitHeights.get(i+1));
             ImageIO.write(source.getSubimage(0, splitHeights.get(i), source.getWidth(), splitHeights.get(i+1) - splitHeights.get(i)), "PNG",
-                    new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i+1 + ".png"));
+                    new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + (i+1) + ".png"));
         }
 
         // Finished message
