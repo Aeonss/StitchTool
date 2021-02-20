@@ -72,6 +72,15 @@ an off-white or black background.
 
 * StitchTool is extremely fast, being able to stitch together 80 (720x1098) images in *less than 5 seconds!*
 
+## YouTube Showcase
+[![Tool Tutorial/Showcase](https://img.youtube.com/vi/wM7R6V1u_7c/maxresdefault.jpg)](https://www.youtube.com/watch?v=wM7R6V1u_7c)
+
 ## TO DO
 
 * N/A
+
+## License
+Agrapedia is licensed under the Apache license. See the file LICENSE for more information. 
+If you plan to use any part of this source code in your own bot, 
+I would be grateful if you would include some form of credit somewhere.
+
