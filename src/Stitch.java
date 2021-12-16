@@ -14,16 +14,16 @@ import java.net.URL;
 import java.util.Properties;
 
 public class Stitch extends Application {
-    private final String version = "1.5";
+    private final String version = "2.0";
 
     @Override
     public void start(Stage window) throws Exception{
         initialization();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("home.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("stitch.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root, 700, 700);
 
-        window.setTitle("Stitch Tool v" + version + " by Agramon");
+        window.setTitle("Stitch Tool v" + version + " by Aeon");
         window.setResizable(false);
         window.setScene(scene);
         window.getIcons().add(new Image("icon.png"));
@@ -32,7 +32,9 @@ public class Stitch extends Application {
         // Checks if there's a newer version of StitchTool
         try {
             checkVersion();
-        } catch (Exception e) { }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     // Main Method
@@ -40,10 +42,10 @@ public class Stitch extends Application {
         launch(args);
     }
 
-    // Checks the latest GitHub releases to see if there's a updated version of StitchTool
+    // Checks the latest GitHub releases to see if there's an updated version of StitchTool
     public void checkVersion() throws IOException {
         // Connects to the latest repository API
-        URL url = new URL("https://api.github.com/repos/xAgramon/StitchTool/releases/latest");
+        URL url = new URL("https://api.github.com/repos/Aeonss/StitchTool/releases/latest");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.addRequestProperty("User-Agent", "Mozilla/5.0");
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -52,7 +54,8 @@ public class Stitch extends Application {
         StringBuilder response = new StringBuilder();
         String line;
         while ((line = in.readLine()) != null) {
-            response.append(line + "\n");
+            response.append(line);
+            response.append("\n");
         }
         in.close();
 
@@ -70,7 +73,7 @@ public class Stitch extends Application {
             if (a.getResult().getText().equals("OK")) {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     try {
-                        Desktop.getDesktop().browse(new URI("https://github.com/xAgramon/StitchTool/releases/latest"));
+                        Desktop.getDesktop().browse(new URI("https://github.com/Aeonss/StitchTool/releases/latest"));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -81,26 +84,29 @@ public class Stitch extends Application {
 
     // Creates a properties file if it doesn't exist
     public void initialization() throws IOException {
-        // Creates a properties file, nothing happens if it exists
-        File f = new File(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
+        // Creates a properties file if it does not exist
+        String name = System.getProperty("user.home") + File.separator + "stitchtool-config.properties";
+        File f = new File(name);
         if (f.exists()) {
             return;
         }
 
-        // If the properties file is new, sets the keys to default values
-        OutputStream file = new FileOutputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
+        OutputStream file = new FileOutputStream(name);
         file.close();
 
         Properties p = new Properties();
-        FileInputStream i = new FileInputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
+        FileInputStream i = new FileInputStream(name);
         p.load(i);
         i.close();
 
-        OutputStream o = new FileOutputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
+        OutputStream o = new FileOutputStream(name);
         p.setProperty("inputPath", System.getProperty("user.home") + File.separator);
         p.setProperty("outputPath", System.getProperty("user.home") + File.separator);
         p.setProperty("imagePath", System.getProperty("user.home") + File.separator);
         p.setProperty("watermarkPath", System.getProperty("user.home") + File.separator);
+        p.setProperty("lastAction", "STITCHSPLIT");
+        p.setProperty("actionOption", "VERTICAL");
+        p.setProperty("ssOption", "Stitch Vertically, Smart Split");
 
         p.store(o, null);
         o.close();

@@ -1,18 +1,24 @@
+import com.luciad.imageio.webp.WebPReadParam;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.FileImageInputStream;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.URL;
@@ -22,28 +28,41 @@ import java.util.regex.Pattern;
 
 public class Controller implements Initializable {
 
+    // FXML Variables
     @FXML private TextField inputField;
     @FXML private Button inputFolderBTN;
     @FXML private Button inputImagesBTN;
     @FXML private TextField outputField;
     @FXML private TextField nameField;
-    @FXML private RadioButton stitchVert;
-    @FXML private RadioButton stitchHor;
-    @FXML private RadioButton splitHor;
-    @FXML private RadioButton splitVert;
+
+    @FXML private RadioButton stitchSplit;
+    @FXML private RadioButton stitch;
+    @FXML private RadioButton split;
     @FXML private RadioButton smartSplit;
+    @FXML private ChoiceBox<String> stitchSplitOptions;
+    @FXML private RadioButton vertical;
+    @FXML private RadioButton horizontal;
+
     @FXML private Slider opacitySlider;
     @FXML private CheckBox greyOption;
     @FXML private Text title;
 
-    private String inputPath = getConfig("inputPath");
-    private String outputPath = getConfig("outputPath");
-    private String imagePath = getConfig("imagePath");
-    private String watermarkPath = getConfig("watermarkPath");
+    // Read from config
+    private String inputPath;
+    private String outputPath;
+    private String imagePath;
+    private String watermarkPath;
+    private String lastAction;
+    private String actionOption;
+    private String ssOption;
 
-    private List<File> files = new ArrayList<>();
+    private String[] options;
 
-    private final String[] EXTENSIONS = new String[] {"png", "jpg", "jpeg"};
+    // List of files
+    private List<File> files;
+
+    // Makes sure input files are .png, .jpg, or .jpeg
+    private final String[] EXTENSIONS = new String[] {"png", "jpg", "jpeg", "webp"};
     private final FilenameFilter IMAGE_FILTER = (dir, name) -> {
         for (final String ext : EXTENSIONS) {
             if (name.endsWith("." + ext)) {
@@ -54,227 +73,360 @@ public class Controller implements Initializable {
     };
 
     // Default Constructor
-    public Controller() throws IOException {
+    public Controller() {
+        inputPath = getConfig("inputPath");
+        outputPath = getConfig("outputPath");
+        imagePath = getConfig("imagePath");
+        watermarkPath = getConfig("watermarkPath");
+        lastAction = getConfig("lastAction");
+        actionOption = getConfig("actionOption");
+        ssOption = getConfig("ssOption");
+        files = new ArrayList<>();
     }
 
-    // Initializes the Controller Class
+    // Called after constructor
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            File f1 = new File(getConfig("inputPath"));
-            File f2 = new File(getConfig("outputPath"));
-            File f3 = new File(getConfig("imagePath"));
-            File f4 = new File(getConfig("watermarkPath"));
+        greyOption.setTranslateY(10);
+        greyOption.setTranslateY(0);
+        final String[] actions = new String[]{"STITCHSPLIT", "STITCH", "SPLIT", "SMARTSPLIT"};
+        options = new String[]{"Stitch Vertically, Smart Split", "Stitch Vertically, Split Horizontally",
+                "Stitch Vertically, Split Vertically", "Stitch Horizontally, Smart Split",
+                "Stitch Horizontally, Split Horizontally", "Stitch Horizontally, Split Vertically"};
 
-            if (getConfig("inputPath").equals("") || !f1.isDirectory()) {
-                inputPath = System.getProperty("user.home") + File.separator;
-                setConfig("inputPath", System.getProperty("user.home") + File.separator);
-            } else if (getConfig("outputPath").equals("") || !f2.isDirectory()) {
-                outputPath = System.getProperty("user.home") + File.separator;
-                setConfig("outputPath", System.getProperty("user.home") + File.separator);
-            } else if (getConfig("imagePath").equals("") || !f3.isDirectory()) {
-                imagePath = System.getProperty("user.home") + File.separator;
-                setConfig("outputPath", System.getProperty("user.home") + File.separator);
-            } else if (getConfig("watermarkPath").equals("") || !f4.isDirectory()) {
-                watermarkPath = System.getProperty("user.home") + File.separator;
-                setConfig("outputPath", System.getProperty("user.home") + File.separator);
-            }
-        } catch (IOException io) { io.printStackTrace(); }
 
-        files = new ArrayList<>();
+        // Checks to make sure the config is correct
+        File f1 = new File(inputPath);
+        File f2 = new File(outputPath);
+        File f3 = new File(imagePath);
+        File f4 = new File(watermarkPath);
+
+        if (getConfig("inputPath") == null || !f1.isDirectory()) {
+            inputPath = System.getProperty("user.home") + File.separator;
+            setConfig("inputPath", inputPath);
+        }
+        if (getConfig("outputPath") == null || !f2.isDirectory()) {
+            outputPath = System.getProperty("user.home") + File.separator;
+            setConfig("outputPath", outputPath);
+        }
+        if (getConfig("imagePath") == null || !f3.isDirectory()) {
+            imagePath = System.getProperty("user.home") + File.separator;
+            setConfig("imagePath", imagePath);
+        }
+        if (getConfig("watermarkPath") == null || !f4.isDirectory()) {
+            watermarkPath = System.getProperty("user.home") + File.separator;
+            setConfig("watermarkPath", watermarkPath);
+        }
+        if (getConfig("lastAction") == null || !Arrays.asList(actions).contains(getConfig("lastAction"))) {
+            lastAction = "STITCHSPLIT";
+            setConfig("lastAction", lastAction);
+        }
+        if (getConfig("actionOption") == null || !getConfig("actionOption").equalsIgnoreCase("VERTICAL") || !getConfig("actionOption").equalsIgnoreCase("HORIZONTAL")) {
+            actionOption = "VERTICAL";
+            setConfig("actionOption", actionOption);
+        }
+        if (getConfig("ssOption") == null || !Arrays.asList(options).contains(getConfig("ssOption"))) {
+            ssOption = "Stitch Vertically, Smart Split";
+            setConfig("ssOption", ssOption);
+        }
+
+        inputField.setText(inputPath);
         outputField.setText(outputPath);
+
+        final ObservableList<String> optionsList = FXCollections.observableArrayList(options);
+        stitchSplitOptions.setItems(optionsList);
+        stitchSplitOptions.setValue(ssOption);
+
+        switch (lastAction) {
+            case "STITCHSPLIT":
+                stitchSplit.setSelected(true);
+                break;
+            case "STITCH":
+                stitch.setSelected(true);
+                break;
+            case "SPLIT":
+                split.setSelected(true);
+                break;
+            case "SMARTSPLIT":
+                smartSplit.setSelected(true);
+                break;
+        }
+        updateGUI();
     }
 
-    public void onInputFolderBTN(MouseEvent e) throws IOException {
+    // Updates the GUI when action is switched
+    public void updateGUI() {
+        if (files == null) {
+            files = new ArrayList<>();
+        }
+
+        // Changing from stitching to splitting
+        if (files.size() >= 1 && (smartSplit.isSelected() || split.isSelected())) {
+            files = new ArrayList<>();
+            inputField.setText("");
+            nameField.setText("");
+
+            inputImagesBTN.setText("Import Image");
+            inputFolderBTN.setVisible(false);
+            inputImagesBTN.setPrefWidth(220);
+            inputImagesBTN.setTranslateX(310);
+            inputImagesBTN.setTranslateY(-50);
+        }
+
+        // Changing from splitting to stitching
+        else if (files.size() == 1 && (stitchSplit.isSelected() || stitch.isSelected())) {
+            files = new ArrayList<>();
+            inputField.setText("");
+            nameField.setText("");
+
+            inputImagesBTN.setText("Import Images");
+            inputFolderBTN.setVisible(true);
+            inputImagesBTN.setPrefWidth(100.0);
+            inputImagesBTN.setTranslateX(0);
+            inputImagesBTN.setTranslateY(0);
+        }
+
+        // No image has been selected yet
+        else {
+            if (stitchSplit.isSelected()) {
+                inputImagesBTN.setText("Import Images");
+                inputFolderBTN.setVisible(true);
+                inputImagesBTN.setPrefWidth(100.0);
+                inputImagesBTN.setTranslateX(0);
+                inputImagesBTN.setTranslateY(0);
+                vertical.setDisable(true);
+                horizontal.setDisable(true);
+                stitchSplitOptions.setDisable(false);
+            }
+            else if (stitch.isSelected()) {
+                inputImagesBTN.setText("Import Images");
+                inputFolderBTN.setVisible(true);
+                inputImagesBTN.setPrefWidth(100.0);
+                inputImagesBTN.setTranslateX(0);
+                inputImagesBTN.setTranslateY(0);
+                vertical.setDisable(false);
+                horizontal.setDisable(false);
+                stitchSplitOptions.setDisable(true);
+
+            }
+            else if (split.isSelected()) {
+                inputImagesBTN.setText("Import Image");
+                inputFolderBTN.setVisible(false);
+                inputImagesBTN.setPrefWidth(220);
+                inputImagesBTN.setTranslateX(310);
+                inputImagesBTN.setTranslateY(-50);
+                vertical.setDisable(false);
+                horizontal.setDisable(false);
+                stitchSplitOptions.setDisable(true);
+            }
+            else if (smartSplit.isSelected()) {
+                inputImagesBTN.setText("Import Image");
+                inputFolderBTN.setVisible(false);
+                inputImagesBTN.setPrefWidth(220);
+                inputImagesBTN.setTranslateX(310);
+                inputImagesBTN.setTranslateY(-50);
+                vertical.setDisable(true);
+                horizontal.setDisable(true);
+                stitchSplitOptions.setDisable(true);
+            }
+        }
+
+    }
+
+    // ImportFolder button pressed
+    public void onImportFolder() {
+        // Empty list of existing images
         files = new ArrayList<>();
 
+        // Ask user to select a folder
         DirectoryChooser input = new DirectoryChooser();
         input.setTitle("Select Folder of Images");
         input.setInitialDirectory(new File(inputPath));
         File folder = input.showDialog(title.getScene().getWindow());
 
+        // If no folder is selected
         if (folder == null) {
-            reset();
             return;
         }
 
-        inputPath = folder.getParent();
-        setConfig("inputPath", folder.getParentFile().getAbsolutePath() + File.separator);
+        // Updates config
+        inputPath = folder.getParentFile().getAbsolutePath() + File.separator;
+        setConfig("inputPath", inputPath);
 
-        for (File image : folder.listFiles(IMAGE_FILTER)) {
-            files.add(image);
+        // Adds all images in the folder to list
+        File[] images = folder.listFiles(IMAGE_FILTER);
+        if (images == null) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("No images in folder!");
+            a.showAndWait();
+            return;
         }
 
-        if ((files.size() <= 1 && (stitchVert.isSelected() || stitchHor.isSelected()))) {
-            Alert error = new Alert(Alert.AlertType.ERROR);
-            error.setHeaderText(null);
-            error.setContentText("Not enough images selected!");
-            error.showAndWait();
-            reset();
-        } else {
-            inputField.setText(folder.getAbsolutePath() + File.separator);
-            if ((stitchVert.isSelected() || stitchHor.isSelected()) && nameField.getText().isEmpty()) {
-                nameField.setText(folder.getName());
-            }
+        files.addAll(Arrays.asList(images));
+
+        // Updates GUI
+        inputField.setText(folder.getAbsolutePath() + File.separator);
+        if (nameField.getText().isEmpty()) {
+            nameField.setText(folder.getName());
         }
     }
 
-    public void onInputImagesBTN(MouseEvent e) throws IOException {
+    // Import images button pressed
+    public void onImportImages() {
+        // Empty list of existing images
         files = new ArrayList<>();
 
+        // Ask user to select image(s)
         FileChooser input = new FileChooser();
         input.setTitle("Select Folder of Images");
         input.setInitialDirectory(new File(inputPath));
         input.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.webp"));
 
-        if (stitchVert.isSelected() || stitchHor.isSelected()) {
+        // Add all images to list if user is stitching
+        if (stitchSplit.isSelected() || stitch.isSelected()) {
             files = input.showOpenMultipleDialog(title.getScene().getWindow());
             if (files == null) {
-                files = new ArrayList<>();
-                reset();
                 return;
             }
-        } else if (splitHor.isSelected() || splitVert.isSelected() || smartSplit.isSelected()) {
+
+            // If less than 2 images are chosen, alert user
+            if (files.size() <= 1) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("At least 2 images is needed to stitch!");
+                a.showAndWait();
+                return;
+            }
+        }
+
+        // Add image to list if user is splitting
+        else if (split.isSelected() || smartSplit.isSelected()) {
             File f = input.showOpenDialog(title.getScene().getWindow());
             if (f == null) {
-                reset();
                 return;
-            } else {
-                files.add(f);
             }
+            files.add(f);
         }
 
+        // Update config
         inputPath = files.get(0).getParentFile().getAbsolutePath() + File.separator;
-        setConfig("inputPath", files.get(0).getParentFile().getAbsolutePath() + File.separator);
+        setConfig("inputPath", inputPath);
 
-        if (files.size() <= 1 && (stitchVert.isSelected() || stitchHor.isSelected())) {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setHeaderText(null);
-            a.setContentText("At least 2 images is needed to stitch!");
-            a.showAndWait();
-            reset();
-            return;
-        }
 
+        // Update GUI
         inputField.setText(files.get(0).getParentFile().getAbsolutePath() + File.separator);
 
-        if ((stitchVert.isSelected() || stitchHor.isSelected()) && nameField.getText().isEmpty()) {
+        if ((stitchSplit.isSelected() || stitch.isSelected()) && nameField.getText().isEmpty()) {
             nameField.setText(files.get(0).getParentFile().getName());
-        } else if ((splitVert.isSelected() || splitHor.isSelected()) & nameField.getText().isEmpty()) {
+        }
+        else if ((split.isSelected() || smartSplit.isSelected()) && nameField.getText().isEmpty()) {
             nameField.setText("StitchTool-");
         }
     }
 
-    public void onOutputBTN(MouseEvent e) throws IOException {
+    // Output button pressed
+    public void onOutput() {
+        // Ask user to choose output directory
         DirectoryChooser output = new DirectoryChooser();
-        if (getConfig("inputPath").isEmpty()) {
-            output.setInitialDirectory(new File(System.getProperty("user.home")));
-        } else {
-            output.setInitialDirectory(new File(outputPath));
-        }
+        output.setInitialDirectory(new File(outputPath));
         File folder = output.showDialog(title.getScene().getWindow());
 
         if (folder == null) {
-            reset();
             return;
         }
 
         outputField.setText(folder.getAbsolutePath() + File.separator);
         outputPath = folder.getAbsolutePath() + File.separator;
-        setConfig("outputPath", folder.getAbsolutePath() + File.separator);
+        setConfig("outputPath", outputPath);
     }
 
-    public void onStitchVert(MouseEvent e) {
-        inputField.setText("");
-        files = new ArrayList<>();
-        nameField.setText("");
-        inputImagesBTN.setText("Import Images");
-        inputFolderBTN.setVisible(true);
-
-        inputImagesBTN.setTranslateX(420);
-        inputImagesBTN.setTranslateY(-30);
-        inputImagesBTN.setPrefWidth(120.0);
-    }
-
-    public void onStitchHor(MouseEvent e) {
-        inputField.setText("");
-        files = new ArrayList<>();
-        nameField.setText("");
-        inputImagesBTN.setText("Import Images");
-        inputFolderBTN.setVisible(true);
-
-        inputImagesBTN.setTranslateX(420);
-        inputImagesBTN.setTranslateY(-30);
-        inputImagesBTN.setPrefWidth(120.0);
-    }
-
-    public void onSplitHor(MouseEvent e) {
-        inputField.setText("");
-        files = new ArrayList<>();
-        nameField.setText("StitchTool-");
-        inputImagesBTN.setText("Import Image");
-        inputFolderBTN.setVisible(false);
-
-        inputImagesBTN.setTranslateX(310);
-        inputImagesBTN.setTranslateY(-30);
-        inputImagesBTN.setPrefWidth(220.0);
-    }
-
-    public void onSplitVert(MouseEvent e) {
-        inputField.setText("");
-        files = new ArrayList<>();
-        nameField.setText("StitchTool-");
-        inputImagesBTN.setText("Import Image");
-        inputFolderBTN.setVisible(false);
-
-        inputImagesBTN.setTranslateX(310);
-        inputImagesBTN.setTranslateY(-30);
-        inputImagesBTN.setPrefWidth(220.0);
-    }
-
-    public void onSmartSplit(MouseEvent e) {
-        inputField.setText("");
-        files = new ArrayList<>();
-        nameField.setText("StitchTool-");
-        inputImagesBTN.setText("Import Image");
-        inputFolderBTN.setVisible(false);
-
-        inputImagesBTN.setTranslateX(310);
-        inputImagesBTN.setTranslateY(-30);
-        inputImagesBTN.setPrefWidth(220.0);
-    }
-
-    public void onRunBTN(MouseEvent e) throws IOException, InterruptedException {
+    // Run button pressed
+    public void onRun() {
+        // No images in list
         if (files.size() == 0) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setHeaderText(null);
-            a.setContentText("Please select an input!");
+            a.setContentText("Please select image(s) to stitch or split!");
             a.showAndWait();
-        } else if (nameField.getText().equals("")) {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setHeaderText(null);
-            a.setContentText("Please enter an image name!");
-            a.showAndWait();
-        } else {
-            if (files.size() > 1) {
-                List<File> temp = new ArrayList<>(files);
-                Collections.sort(temp, Comparator.comparing(File::getName, new FileNameComparator()));
-                files = new ArrayList<>(temp);
+            return;
+        }
+
+        // Checks if the image has a name
+        if (nameField.getText().isEmpty()) {
+            nameField.setText(generateString(10));
+        }
+
+        // Stitch / Split
+        try {
+            // Sort the files in alphanumerical order and load them
+            BufferedImage b;
+            ArrayList<File> newFiles = new ArrayList<>(files);
+            Collections.sort(newFiles, Comparator.comparing(File::getName, new FileNameComparator()));
+            files = new ArrayList<>(newFiles);
+
+            ArrayList<BufferedImage> images = new ArrayList<>();
+            for (File image : files) {
+                // Gets the extension of the file
+                String fileName = image.toString();
+                String extension = "";
+                int index = fileName.lastIndexOf('.');
+                if(index > 0) {
+                    extension = fileName.substring(index + 1);
+                }
+
+                // If the image is a webp
+                if (extension.equals("webp")) {
+                    ImageReader reader = ImageIO.getImageReadersByMIMEType("image/webp").next();
+                    WebPReadParam readParam = new WebPReadParam();
+                    readParam.setBypassFiltering(true);
+                    reader.setInput(new FileImageInputStream(image));
+                    b = reader.read(0, readParam);
+                }
+
+                // PNG/JPG/JPEG
+                else {
+                    b = ImageIO.read(image);
+                }
+                images.add(b);
             }
-            loadImages(files);
+
+            if (stitchSplit.isSelected()) {
+                doStitchSplit(images);
+                lastAction = "STITCHSPLIT";
+                ssOption = stitchSplitOptions.getValue();
+                setConfig("ssOption", ssOption);
+            }
+
+            else if (stitch.isSelected()) {
+                doStitch(images);
+                lastAction = "STITCH";
+            }
+            else if (split.isSelected()) {
+                imageSplit(images.get(0));
+                lastAction = "SPLIT";
+            }
+            else if (smartSplit.isSelected()) {
+                doSmartSplit(images.get(0));
+                lastAction = "SMARTSPLIT";
+            }
+            setConfig("lastAction", lastAction);
+
+            if (vertical.isSelected()) {
+                actionOption = "VERTICAL";
+            } else {
+                actionOption = "HORIZONTAL";
+            }
+            setConfig("actionOption", actionOption);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
-    public void onWatermarkBTN(MouseEvent e) throws IOException {
-        // Requires name to start
-        if (nameField.getText().isEmpty()) {
-            nameField.setText("StitchTool");
-        }
-        BufferedImage image;
-        BufferedImage watermark;
-        List<File> watermarkArray = new ArrayList<>();
-
+    // Watermark button pressed
+    public void onWatermark() throws IOException {
         // Asks for the image to be watermarked
         FileChooser imageInput = new FileChooser();
         imageInput.setTitle("Select Image to Watermark!");
@@ -282,14 +434,13 @@ public class Controller implements Initializable {
         File imageFile = imageInput.showOpenDialog(title.getScene().getWindow());
 
         if (imageFile == null) {
-            reset();
             return;
         }
 
-        watermarkArray.add(imageFile);
-
-        image = ImageIO.read(watermarkArray.get(0));
-        setConfig("imagePath", imageFile.getParentFile().getAbsolutePath());
+        // Updates config
+        BufferedImage image = ImageIO.read(imageFile);
+        imagePath = imageFile.getParentFile().getAbsolutePath() + File.separator;
+        setConfig("imagePath", imagePath);
 
         // Asks for the watermark image
         FileChooser watermarkInput = new FileChooser();
@@ -298,14 +449,13 @@ public class Controller implements Initializable {
         File watermarkFile = watermarkInput.showOpenDialog(title.getScene().getWindow());
 
         if (watermarkFile == null) {
-            reset();
             return;
         }
 
-        watermarkArray.add(watermarkFile);
-
-        watermark = ImageIO.read(watermarkArray.get(1));
-        setConfig("watermarkPath", watermarkFile.getParentFile().getAbsolutePath());
+        // Updates config
+        BufferedImage watermark = ImageIO.read(watermarkFile);
+        watermarkPath = watermarkFile.getParentFile().getAbsolutePath() + File.separator;
+        setConfig("watermarkPath", watermarkPath);
 
         // Makes the watermark black and white
         if (greyOption.isSelected()) {
@@ -357,6 +507,11 @@ public class Controller implements Initializable {
         }
         g.dispose();
 
+        // Checks if the image has a name
+        if (nameField.getText().isEmpty()) {
+            nameField.setText(imageFile.getName() + "_watermarked");
+        }
+
         // Exports the image
         try {
             ImageIO.write(image, "PNG", new File(outputPath + nameField.getText() + ".png"));
@@ -364,57 +519,197 @@ public class Controller implements Initializable {
             a.setHeaderText(null);
             a.setContentText("The image has been watermarked " + num + " times!");
             a.showAndWait();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-        watermarkArray.clear();
-    }
-
-    // Loads the selected images for stitching/splitting
-    public void loadImages(List<File> files) throws IOException, InterruptedException {
-        ArrayList<BufferedImage> images = new ArrayList<>();
-        for (File image : files) {
-            BufferedImage b = ImageIO.read(image);
-            images.add(b);
-        }
-
-        if (stitchVert.isSelected()) {
-            verticalStitch(images);
-        } else if (stitchHor.isSelected()){
-            horizontalStitch(images);
-        } else if (splitVert.isSelected()) {
-            imageSplit(images.get(0));
-        } else if (splitHor.isSelected()) {
-            imageSplit(images.get(0));
-        } else if (smartSplit.isSelected()) {
-            doSmartSplit(images.get(0));
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 
-    // Stitches an ArrayList of images vertically
-    public void verticalStitch(ArrayList<BufferedImage> images) throws IOException {
-        int concatHeight = 0;
+    // Stitch vertically/horizontally and Split horizontally/vertically/smart
+    public void doStitchSplit(ArrayList<BufferedImage> images) throws IOException {
+        String option = stitchSplitOptions.getValue();
 
-        // Gets the total height of the stitches image and prepares a Graphics2D for it
+        // Stitch vertically first
+        int concat = 0;
+        int curr = 0;
+        boolean stitchVert = option.equalsIgnoreCase(options[0]) || option.equalsIgnoreCase(options[1]) || option.equalsIgnoreCase(options[2]);
+
+        // STITCH
         for (BufferedImage b : images) {
-            concatHeight += b.getHeight();
+            if (stitchVert) {
+                concat += b.getHeight();
+            } else {
+                concat += b.getWidth();
+            }
+            Graphics2D g2d = b.createGraphics();
+            g2d.dispose();
+        }
+        BufferedImage concatImage;
+        if (stitchVert) {
+            concatImage = new BufferedImage(images.get(0).getWidth(), concat, BufferedImage.TYPE_INT_RGB);
+        } else {
+            concatImage = new BufferedImage(concat, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
+        }
+        Graphics2D g2d = concatImage.createGraphics();
+
+        // Draws the images on the Graphics2D
+        for (BufferedImage b : images) {
+            if (stitchVert) {
+                g2d.drawImage(b, 0, curr, null);
+                curr += b.getHeight();
+            } else {
+                g2d.drawImage(b, curr, 0, null);
+                curr += b.getWidth();
+            }
+        }
+        g2d.dispose();
+
+        int splitAction = -1;
+        // Smart Split = 0
+        if (option.equalsIgnoreCase(options[0]) || option.equalsIgnoreCase(options[3])) {
+            splitAction = 0;
+        }
+        // Split horizontally = 1
+        if (option.equalsIgnoreCase(options[1]) || option.equalsIgnoreCase(options[4])) {
+            splitAction = 1;
+        }
+        // Split vertically = 2
+        if (option.equalsIgnoreCase(options[2]) || option.equalsIgnoreCase(options[5])) {
+            splitAction = 2;
+        }
+
+
+        // Split vertically or split horizontally
+        if (splitAction == 1 || splitAction == 2) {
+            // Ask user how many images the image is to be split into
+            TextInputDialog input = new TextInputDialog();
+            input.setHeaderText(null);
+            input.setContentText("How many images would you like the image to be split into?");
+            input.showAndWait();
+            if (input.getResult() == null) {
+                return;
+            }
+            int num = 0;
+            boolean cont = true;
+            while (cont) {
+                try {
+                    num = Integer.parseInt(input.getResult());
+                } catch (NumberFormatException nfe) {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setHeaderText(null);
+                    a.setContentText("Please input numbers only!");
+                    a.showAndWait();
+                    continue;
+                }
+
+                if (num < 2) {
+                    Alert a = new Alert(Alert.AlertType.ERROR);
+                    a.setHeaderText(null);
+                    a.setContentText("Please input a number that is at least 2!");
+                    a.showAndWait();
+                } else {
+                    cont = false;
+                }
+            }
+
+            JFrame frame = new JFrame();
+            frame.setTitle("Split Preview");
+            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
+
+            int i = 1;
+            new File(outputPath + File.separator + "StitchTool" + File.separator).mkdirs();
+
+            // Split horizontally
+            if (splitAction == 1) {
+                int r = concatImage.getHeight() % num;
+                int parts = (concatImage.getHeight() - r) / num;
+
+                // Exports the images into a folder
+                for (int y = 0; y < concatImage.getHeight() - r; y += parts) {
+                    ImageIO.write(concatImage.getSubimage(0, y, concatImage.getWidth(), parts), "PNG",
+                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + ".png"));
+                }
+
+                // Exports the remainder if split unevenly
+                if (r != 0) {
+                    ImageIO.write(concatImage.getSubimage(0, concatImage.getHeight() - (parts * num), concatImage.getWidth(), r), "PNG",
+                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + ".png"));
+                }
+            }
+
+            // Split vertically
+            else {
+                int r = concatImage.getWidth() % num;
+                int parts = concatImage.getWidth() / num;
+
+                // Exports the images into a folder
+                for (int x = 0; x < (concatImage.getWidth() - r); x += parts) {
+                    ImageIO.write(concatImage.getSubimage(x, 0, parts, concatImage.getHeight()), "PNG",
+                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + ".png"));
+                }
+
+                // Exports the remainder if split unevenly
+                if (r != 0) {
+                    ImageIO.write(concatImage.getSubimage(concatImage.getWidth() - (parts * num), 0, concatImage.getHeight(), r), "PNG",
+                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + ".png"));
+                }
+            }
+
+            // Finished message
+            Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+            a.setHeaderText(null);
+            a.setContentText("Successfully split into " + num + " images!");
+            a.showAndWait();
+            return;
+
+        }
+
+        // Smart split
+        if (splitAction == 0) {
+            doSmartSplit(concatImage);
+        }
+
+    }
+
+    // Stitches an ArrayList of images vertically/horizontally
+    public void doStitch(ArrayList<BufferedImage> images) throws IOException {
+        int concat = 0;
+        int curr = 0;
+        for (BufferedImage b : images) {
+            if (vertical.isSelected()) {
+                concat += b.getHeight();
+            }
+            else if (horizontal.isSelected()) {
+                concat += b.getWidth();
+            }
             Graphics2D g2d = b.createGraphics();
             g2d.dispose();
         }
 
-        int heightCurr = 0;
+        BufferedImage concatImage;
 
-        BufferedImage concatImage = new BufferedImage(images.get(0).getWidth(), concatHeight, BufferedImage.TYPE_INT_RGB);
+        if (vertical.isSelected()) {
+            concatImage = new BufferedImage(images.get(0).getWidth(), concat, BufferedImage.TYPE_INT_RGB);
+        }
+        else if (horizontal.isSelected()) {
+            concatImage = new BufferedImage(concat, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
+        } else {
+            System.out.println("Stitched image missing!");
+            return;
+        }
         Graphics2D g2d = concatImage.createGraphics();
-
 
         // Draws the images on the Graphics2D
         for (BufferedImage b : images) {
-            g2d.drawImage(b, 0, heightCurr, null);
-            heightCurr += b.getHeight();
+            if (vertical.isSelected()) {
+                g2d.drawImage(b, 0, curr, null);
+                curr += b.getHeight();
+            }
+            else if (horizontal.isSelected()) {
+                g2d.drawImage(b, curr, 0, null);
+                curr += b.getWidth();
+            }
         }
         g2d.dispose();
-
 
         // Exports the image
         ImageIO.write(concatImage, "PNG", new File(outputPath + nameField.getText() + ".png"));
@@ -424,37 +719,7 @@ public class Controller implements Initializable {
         a.showAndWait();
     }
 
-    // Stitches an ArrayList of images horizontally
-    public void horizontalStitch(ArrayList<BufferedImage> images) throws IOException {
-        int concatWidth = 0;
-
-        // Gets the total width of the stitches image and prepares a Graphics2D for it
-        for (BufferedImage b : images) {
-            concatWidth += b.getWidth();
-            Graphics2D g2d = b.createGraphics();
-            g2d.dispose();
-        }
-
-        int widthCurr = 0;
-        BufferedImage concatImage = new BufferedImage(concatWidth, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = concatImage.createGraphics();
-
-        // Draws the images on the Graphics2D
-        for (BufferedImage b : images) {
-            g2d.drawImage(b, widthCurr, 0, null);
-            widthCurr += b.getWidth();
-        }
-        g2d.dispose();
-
-        // Exports the image
-        ImageIO.write(concatImage, "PNG", new File(outputPath + nameField.getText() + ".png"));
-        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setHeaderText(null);
-        a.setContentText(files.size() + " images were successfully stitched!");
-        a.showAndWait();
-    }
-
-    // Splits a BufferedImage vertically or horizontally
+    // Splits a BufferedImage vertically/horizontally
     public void imageSplit(BufferedImage source) throws IOException {
         JFrame frame = new JFrame();
         frame.setTitle("Split Preview");
@@ -466,7 +731,7 @@ public class Controller implements Initializable {
             // Asks the user how many images they want
             TextInputDialog input = new TextInputDialog();
             input.setHeaderText(null);
-            input.setContentText("How many images would you like it to be split into?");
+            input.setContentText("How many images would you like the image to be split into?");
             input.showAndWait();
             if (input.getResult() == null) {
                 return;
@@ -478,7 +743,7 @@ public class Controller implements Initializable {
             } catch (NumberFormatException nfe) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
                 a.setHeaderText(null);
-                a.setContentText("Please input a number only!");
+                a.setContentText("Please input numbers only!");
                 a.showAndWait();
                 continue;
             }
@@ -511,49 +776,13 @@ public class Controller implements Initializable {
                     split = false;
                 }
                 frame.dispose();
-                //frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-            }
-        }
-
-        double height = (double) source.getHeight() / num;
-        double width = (double) source.getWidth() / num;
-
-        // Checks if splitting vertically/horizontally that it can be split evenly
-        if ((splitHor.isSelected() && height % 1 != 0) || (splitVert.isSelected() && width % 1 != 0)) {
-            ArrayList<Integer> divisible = new ArrayList<>();
-
-            // Adds divisible numbers to an array to be shown
-            if (splitHor.isSelected()) {
-                for (int i = 2; i < source.getHeight(); i ++) {
-                    if (source.getHeight() % i == 0 && i <= 100) {
-                        divisible.add(i);
-                    }
-                }
-            } else if (splitVert.isSelected()) {
-                for (int k = 2; k < source.getWidth(); k++) {
-                    if (source.getWidth() % k == 0 && k <= 100) {
-                        divisible.add(k);
-                    }
-                }
-            }
-
-            // Lets the user know the image cannot be divided evenly. Allows them to continue or not.
-            Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-            a.setHeaderText("Do you wish to continue?");
-            a.setContentText("The image cannot be divided into " + num +
-                    " images evenly. \n You can divide the image equally into: " +
-                    divisible.toString() + " images! \n");
-            a.showAndWait();
-
-            if (a.getResult().getText().equalsIgnoreCase("Cancel")) {
-                return;
             }
         }
 
         int i = 1;
         new File(outputPath + File.separator + "StitchTool" + File.separator).mkdirs();
 
-        if (splitHor.isSelected()) {
+        if (horizontal.isSelected()) {
             int r = source.getHeight() % num;
             int parts = (source.getHeight() - r) / num;
 
@@ -568,12 +797,14 @@ public class Controller implements Initializable {
                 ImageIO.write(source.getSubimage(0, source.getHeight() - (parts * num), source.getWidth(), r), "PNG",
                         new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + ".png"));
             }
-        } else {
+        }
+
+        else if (vertical.isSelected()) {
             int r = source.getWidth() % num;
             int parts = source.getWidth() / num;
 
             // Exports the images into a folder
-            for (int x = 0; x < (source.getWidth() - r) / num; x += parts) {
+            for (int x = 0; x < (source.getWidth() - r); x += parts) {
                 ImageIO.write(source.getSubimage(x, 0, parts, source.getHeight()), "PNG",
                         new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + ".png"));
             }
@@ -588,7 +819,7 @@ public class Controller implements Initializable {
         // Finished message
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setHeaderText(null);
-        a.setContentText(num + " images were successfully created!");
+        a.setContentText("Successfully split into " + num + " images!");
         a.showAndWait();
     }
 
@@ -600,19 +831,18 @@ public class Controller implements Initializable {
             // Asks the user how many images they want
             TextInputDialog input = new TextInputDialog();
             input.setHeaderText(null);
-            input.setContentText("How many images would you like it to be split into? (±1)");
+            input.setContentText("How many images would you like the image to be split into? (±1)");
             input.showAndWait();
             if (input.getResult() == null) {
                 return;
             }
-
             // Checks if the input is a number
             try {
                 num = Integer.parseInt(input.getResult());
             } catch (NumberFormatException nfe) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
                 a.setHeaderText(null);
-                a.setContentText("Please input a number only!");
+                a.setContentText("Please input numbers only!");
                 a.showAndWait();
                 continue;
             }
@@ -630,7 +860,7 @@ public class Controller implements Initializable {
 
         // Approximate size of each image
         int startHeight = source.getHeight() / num;
-        List<Integer> splitHeights = new ArrayList();
+        ArrayList<Integer> splitHeights = new ArrayList<>();
         // Starts from 0
         splitHeights.add(0);
 
@@ -658,7 +888,6 @@ public class Controller implements Initializable {
 
         // Exports the images into a folder
         for (int i = 0; i < splitHeights.size() - 1; i++) {
-            //System.out.println("height: " + source.getHeight() + " from: " + splitHeights.get(i) + " to: " + splitHeights.get(i+1));
             ImageIO.write(source.getSubimage(0, splitHeights.get(i), source.getWidth(), splitHeights.get(i+1) - splitHeights.get(i)), "PNG",
                     new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + (i+1) + ".png"));
         }
@@ -666,7 +895,12 @@ public class Controller implements Initializable {
         // Finished message
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setHeaderText(null);
-        a.setContentText(splitHeights.size()-1 + " images were successfully created!");
+        int numImages = splitHeights.size() - 1;
+        if (numImages == 1) {
+            a.setContentText("Unable to smart split!");
+        } else {
+            a.setContentText(splitHeights.size() - 1 + " images were successfully created!");
+        }
         a.showAndWait();
     }
 
@@ -676,28 +910,22 @@ public class Controller implements Initializable {
         int red = (pixel >> 16) & 0xff;
         int green = (pixel >> 8) & 0xff;
         int blue = (pixel) & 0xff;
-        Color c = new Color(red, green, blue, alpha);
-        return c;
+        return new Color(red, green, blue, alpha);
     }
 
     // Compares 2 color objects. True if same, false if not.
     public boolean ColorCompare(Color o1, Color o2) {
-        if (o1.getAlpha() == o2.getAlpha() && o1.getRed() == o2.getRed() && o1.getGreen() == o2.getGreen() && o1.getBlue() == o2.getBlue()) {
-            return true;
-        }
-        return false;
+        return o1.getAlpha() == o2.getAlpha() && o1.getRed() == o2.getRed() && o1.getGreen() == o2.getGreen() && o1.getBlue() == o2.getBlue();
     }
 
     // Custom comparator class that makes sure files are in alpha-numerical order
     public static final class FileNameComparator implements Comparator<String> {
         public final Pattern NUMBERS =
                 Pattern.compile("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
-        @Override public final int compare(String o1, String o2) {
-            // Optional "NULLS LAST" semantics:
+        @Override public int compare(String o1, String o2) {
             if (o1 == null || o2 == null)
                 return o1 == null ? o2 == null ? 0 : -1 : 1;
 
-            // Splitting both input strings by the above patterns
             String[] split1 = NUMBERS.split(o1);
             String[] split2 = NUMBERS.split(o2);
             for (int i = 0; i < Math.min(split1.length, split2.length); i++) {
@@ -705,23 +933,19 @@ public class Controller implements Initializable {
                 char c2 = split2[i].charAt(0);
                 int cmp = 0;
 
-                // If both segments start with a digit, sort them numerically using
-                // BigInteger to stay safe
-                if (c1 >= '0' && c1 <= '9' && c2 >= '0' && c2 <= '9')
+
+                if (c1 >= '0' && c1 <= '9' && c2 >= '0' && c2 <= '9') {
                     cmp = new BigInteger(split1[i]).compareTo(new BigInteger(split2[i]));
-
-                // If we haven't sorted numerically before, or if numeric sorting yielded
-                // equality (e.g 007 and 7) then sort lexicographically
-                if (cmp == 0)
+                }
+                if (cmp == 0) {
                     cmp = split1[i].compareTo(split2[i]);
+                }
 
-                // Abort once some prefix has unequal ordering
-                if (cmp != 0)
+                if (cmp != 0) {
                     return cmp;
+                }
             }
 
-            // If we reach this, then both strings have equally ordered prefixes, but
-            // maybe one string is longer than the other (i.e. has more segments)
             return split1.length - split2.length;
         }
     }
@@ -740,19 +964,13 @@ public class Controller implements Initializable {
         bGr.drawImage(img, 0, 0, null);
         bGr.dispose();
 
-        // Return the buffered image
         return image;
     }
 
     // Custom JPanel that creates a scrollable image
-    public class ScrollPanel extends JPanel {
-        private static final long serialVersionUID = 1L;
-        private BufferedImage image;
-        private JPanel canvas;
-
+    public static class ScrollPanel extends JPanel {
         public ScrollPanel(BufferedImage image, int num) {
-            this.image = image;
-            this.canvas = new JPanel() {
+            JPanel canvas = new JPanel() {
                 @Override
                 protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
@@ -792,32 +1010,46 @@ public class Controller implements Initializable {
         f.setVisible(true);
     }
 
-    // Clears the files selected and various components
-    public void reset() {
-        inputField.setText("");
-        nameField.setText("");
-        files = new ArrayList<>();
-    }
-
     // Gets the value in the config
-    public String getConfig(String key) throws IOException {
+    public String getConfig(String key) {
         Properties p = new Properties();
-        FileInputStream i = new FileInputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
-        p.load(i);
-        i.close();
+        try {
+            FileInputStream i = new FileInputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
+            p.load(i);
+            i.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         return p.getProperty(key);
     }
 
     // Writes a new value in the config
-    public void setConfig(String key, String value) throws IOException{
-        Properties p = new Properties();
-        FileInputStream i = new FileInputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
-        p.load(i);
-        i.close();
+    public void setConfig(String key, String value) {
+        try {
+            Properties p = new Properties();
+            FileInputStream i = new FileInputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
+            p.load(i);
+            i.close();
 
-        OutputStream o = new FileOutputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
-        p.setProperty(key, value);
-        p.store(o, null);
-        o.close();
+            OutputStream o = new FileOutputStream(System.getProperty("user.home") + File.separator + "stitchtool-config.properties");
+            p.setProperty(key, value);
+            p.store(o, null);
+            o.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
+
+    // Generates a random name for the file
+    public String generateString(int n) {
+        final String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        StringBuilder s = new StringBuilder();
+        Random r = new Random();
+        for (int i = 0; i < n; i++) {
+            s.append(chars.charAt(r.nextInt(chars.length() + 1)));
+        }
+        return s.toString();
+
+    }
+
 }

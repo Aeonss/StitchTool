@@ -1,19 +1,22 @@
+/* Main Window */
 .root {
-/*
-    -fx-background-image: url("background.png");
-*/
     -fx-background-color: #191919;
+    -fx-border-width: 2;
+    -fx-border-color: linear-gradient(to top left, #12d6df, #f70fff);
 }
 
-#title{
+/* Title */
+#title {
     -fx-font-weight: 200;
 }
 
+/* Focused input field */
 #inputField:focused{
     -fx-prompt-text-fill: #a9a9a9;
 }
 
-.text-field{
+/* Text Field */
+.text-field {
     -fx-border-width: 2;
     -fx-background-color: null;
     -fx-border-color: #3498db;
@@ -21,9 +24,12 @@
     -fx-border-radius: 24;
     -fx-padding: 0 0 0 20;
     -fx-text-fill: white;
+    -fx-highlight-fill: null;
+    -fx-highlight-text-fill: null;
 }
 
-.button{
+/* Button */
+.button {
     -fx-border-width: 2;
     -fx-background-color: null;
     -fx-border-color: #1abc9c;
@@ -31,24 +37,58 @@
     -fx-border-radius: 24;
 }
 
-.button:hover{
+/* Hover over button */
+.button:hover {
     -fx-border-color: #1abc9c;
     -fx-background-radius: 24;
     -fx-background-color: #1abc9c;
 }
 
-#nameField{
+/* Stitch/Split dropdown */
+#stitchSplitOptions {
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #34495e;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+    -fx-padding: 5 10 5 10;
+}
+
+/* Stitch/Split */
+.choice-box .label {
+    -fx-text-fill: white;
+}
+
+/* Stitch/Split label */
+.choice-box .menu-item .label {
+    -fx-text-fill: black;
+}
+
+/* Vertical button */
+#vertical {
+    -fx-border-color: #34495e;
+}
+
+/* Horizontal button */
+#horizontal {
+    -fx-border-color: #34495e;
+}
+
+/* Name field */
+#nameField {
     -fx-border-color: #e74c3c;
 }
 
-#nameField:focused{
+/* Focused name field */
+#nameField:focused {
     -fx-padding: 0 0 0 -105;
     -fx-border-insets: 0 0 0 -125;
     -fx-background-insets: 0 0 0 -125;
     -fx-pref-width: 425;
 }
 
-.radio-button{
+/* Radio button */
+.radio-button {
     -fx-border-width: 2;
     -fx-background-color: null;
     -fx-border-color: #9b59b6;
@@ -57,11 +97,13 @@
     -fx-padding: 5 10 5 10;
 }
 
+/* Opacity slider */
 .slider .axis {
     -fx-tick-label-fill: white;
 }
 
-#greyOption{
+/* Greyscale checkbox */
+#greyOption {
     -fx-border-width: 2;
     -fx-background-color: null;
     -fx-border-color: #f1c40f;
@@ -70,21 +112,25 @@
     -fx-padding: 5 10 5 10;
 }
 
-#watermarkBTN{
+/* Watermark button */
+#watermarkBTN {
     -fx-border-color: #f1c40f;
 }
 
-#watermarkBTN:hover{
+/* Hovering over watermark button */
+#watermarkBTN:hover {
     -fx-border-color: #f1c40f;
     -fx-background-radius: 24;
     -fx-background-color: #f1c40f;
 }
 
+/* Run button */
 #runBTN {
     -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
 }
 
-#runBTN:hover{
+/* Hover over run button */
+#runBTN:hover {
     -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
     -fx-background-radius: 24;
     -fx-background-color: linear-gradient(to top left, #ff7f50, #6a5acd);
