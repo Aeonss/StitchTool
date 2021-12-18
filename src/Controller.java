@@ -1316,6 +1316,14 @@ public class Controller implements Initializable {
 
     // Run waifu given a file
     public boolean doWaifu(File f) {
+        if (waifuPath == null) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Waifu2x was not found!");
+            a.showAndWait();
+            return false;
+        }
+
         // No options chosen
         int sf = (int) scaleSlider.getValue();
         String shf = scaleHeightField.getText();
