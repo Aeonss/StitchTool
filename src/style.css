@@ -1,0 +1,123 @@
+/* Main Window */
+.root {
+    -fx-background-color: #191919;
+    -fx-border-width: 2;
+    -fx-border-color: linear-gradient(to top left, #12d6df, #f70fff);
+}
+
+.text-field {
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #3498db;
+    -fx-prompt-text-fill: #a9a9a9;
+    -fx-border-radius: 24;
+    -fx-padding: 0 0 0 20;
+    -fx-text-fill: white;
+    -fx-highlight-fill: null;
+    -fx-highlight-text-fill: null;
+}
+
+.button {
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #1abc9c;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+}
+
+.button:hover {
+    -fx-border-color: #1abc9c;
+    -fx-background-radius: 24;
+    -fx-background-color: #1abc9c;
+    -fx-cursor: hand;
+}
+
+.check-box {
+    -fx-border-color: #f1c40f;
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+    -fx-padding: 5 10 5 10;
+}
+
+.choice-box {
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+    -fx-padding: 5 10 5 10;
+}
+
+.choice-box .label {
+    -fx-text-fill: white;
+}
+
+.choice-box .menu-item .label {
+    -fx-text-fill: black;
+}
+
+.radio-button {
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-border-color: #81ecec;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+    -fx-padding: 5 10 5 10;
+}
+
+.slider .axis {
+    -fx-tick-label-fill: white;
+}
+
+
+
+
+#title {
+    -fx-font-weight: 200;
+}
+
+#nameField, #fileOptions {
+    -fx-border-color: #e74c3c;
+}
+
+#waifuField, #scaleField, #scaleHeightField, #scaleWidthField, #denoiseBox, #scaleBox, #modelOptions {
+    -fx-border-color: #a29bfe;
+}
+
+#runWaifuBTN, #waifuBTN {
+    -fx-border-color: #fd79a8;
+}
+#runWaifuBTN:hover, #waifuBTN:hover {
+    -fx-background-radius: 24;
+    -fx-background-color: #fd79a8;
+}
+
+#stitchSplitOptions, #vertical, #horizontal {
+    -fx-border-color: #74b9ff;
+}
+
+#watermarkBTN {
+    -fx-border-color: #f1c40f;
+}
+#watermarkBTN:hover {
+    -fx-background-radius: 24;
+    -fx-background-color: #f1c40f;
+}
+
+#runBTN {
+    -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
+}
+#runBTN:hover {
+    -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
+    -fx-background-radius: 24;
+    -fx-background-color: linear-gradient(to top left, #ff7f50, #6a5acd);
+}
+
+#dropBTN1, #dropBTN2, #dropBTN3 {
+    -fx-border-color: null;
+}
+
+#dropBTN1:hover, #dropBTN2:hover, #dropBTN3:hover {
+    -fx-background-color: null;
+}
