@@ -32,6 +32,7 @@ splitter</u></strong> and <strong><u>integrated denoiser and upscaler</u></stron
 was split through a speech bubble or SFX.
 * Add repeatable watermarks to your images.
 * **<u>Denoise and/or upscale</u>** images while stitching or splitting.
+* Supports .png, .jpg, .jpeg, and .webp!
 
 ## 📝 &nbsp; How To Use
 
