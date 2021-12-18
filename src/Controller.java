@@ -116,6 +116,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
+        // Final values
         final String[] files = new String[]{"PNG", "JPG"};
         final String[] waifuTypes = new String[]{"CAFFE", "VULKAN"};
         caffeModels = new String[]{"cunet", "upresnet10", "upconv_7_anime_style_art_rgb", "upconv_7_photo", "anime_style_art_rgb", "photo", "anime_style_art_y"};
@@ -125,13 +126,12 @@ public class Controller implements Initializable {
                 "Stitch Vertically, Split Vertically", "Stitch Horizontally, Smart Split",
                 "Stitch Horizontally, Split Horizontally", "Stitch Horizontally, Split Vertically"};
 
-
-        // Checks to make sure the config is correct
         File f1 = new File(inputPath);
         File f2 = new File(outputPath);
         File f3 = new File(imagePath);
         File f4 = new File(watermarkPath);
 
+        // Checks to make sure the config is not null or has any invalid values
         if (inputPath == null || !f1.isDirectory()) {
             inputPath = System.getProperty("user.home") + File.separator;
             setConfig("inputPath", inputPath);
@@ -172,6 +172,8 @@ public class Controller implements Initializable {
             setConfig("waifuPath", null);
             waifuField.setText("");
         }
+
+        // If the path is not empty, sets the model options
         if (!waifuPath.isEmpty()) {
             if (waifuPath.contains("caffe")) {
                 modelOption = "CAFFE";
@@ -182,9 +184,10 @@ public class Controller implements Initializable {
             }
         }
 
-        // Default
+        // Default setups
         outputField.setText(outputPath);
 
+        // Modify vanilla JavaFX slider to be in power of 2
         scaleSlider.setLabelFormatter(new StringConverter<Double>() {
             @Override
             public String toString(Double t) {
@@ -214,7 +217,6 @@ public class Controller implements Initializable {
                 }
             }
         });
-
         scaleSlider.setMin(0);
         scaleSlider.setMax(5);
         scaleSlider.setMajorTickUnit(1);
@@ -222,28 +224,33 @@ public class Controller implements Initializable {
         scaleSlider.setShowTickLabels(true);
         scaleSlider.setShowTickMarks(true);
 
+        // Adds the file types to the dropdown menu
         final ObservableList<String> fileList = FXCollections.observableArrayList(files);
         fileOptions.setItems(fileList);
         fileOptions.setValue(fileOption);
 
+        // Adds all permutations of stitch and split to the dropdown menu
         final ObservableList<String> optionsList = FXCollections.observableArrayList(options);
         stitchSplitOptions.setItems(optionsList);
         stitchSplitOptions.setValue(ssOption);
 
+        // Adds the waifu2x models to the dropdown menu if there is a waifuPath
+        // If the waifu is CAFFE
         if (waifuPath.contains("caffe")) {
             modelOption = "CAFFE";
             modelList = FXCollections.observableArrayList(caffeModels);
             modelOptions.setItems(modelList);
             modelOptions.setValue("cunet");
-        } else if (waifuPath.contains("vulkan")) {
+        }
+        // If the waifu is VULKAN
+        else if (waifuPath.contains("vulkan")) {
             modelOption = "VULKAN";
             modelList = FXCollections.observableArrayList(vulkanModels);
             modelOptions.setItems(modelList);
             modelOptions.setValue("models-cunet");
-        } else {
-            return;
         }
 
+        // Sets the last action
         switch (lastAction) {
             case "STITCHSPLIT":
                 stitchSplit.setSelected(true);
@@ -259,6 +266,7 @@ public class Controller implements Initializable {
                 break;
         }
 
+        // Sets the last action option
         if (actionOption.equalsIgnoreCase("VERTICAL")) {
             vertical.isSelected();
         }
@@ -266,12 +274,14 @@ public class Controller implements Initializable {
             horizontal.isSelected();
         }
 
+        // Sets the last file option
         if (fileOption.equalsIgnoreCase("PNG")) {
             fileOptions.setValue("PNG");
         } else {
             fileOptions.setValue("JPG");
         }
 
+        // Updates GUI
         updateGUI();
         onDenoise();
         onScale();
@@ -500,140 +510,26 @@ public class Controller implements Initializable {
         waifuField.setText(waifuPath);
     }
 
+    // Running waifu2x standalone
     public void onRunWaifu() {
-        if (waifuPath == null) {
-            Alert a = new Alert(Alert.AlertType.ERROR);
-            a.setHeaderText(null);
-            a.setContentText("Waifu2x was not found!");
-            a.showAndWait();
-            return;
-        }
-
-        // No options chosen
         int sf = (int) scaleSlider.getValue();
         String shf = scaleHeightField.getText();
         String swf = scaleWidthField.getText();
 
+        // If no waifu2x options were chosen
         if ((!denoiseBox.isSelected() || sf == 1) && (sf == 1 && shf.isEmpty() && swf.isEmpty())) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setHeaderText(null);
             a.setContentText("No Waifu2X options were chosen!");
             a.showAndWait();
-            return;
         }
-
-        if (!shf.isEmpty() && !swf.isEmpty() && sf == 1) {
-            if (!isNumber(shf) || !isNumber(swf)) {
-                scaleSlider.setValue(1);
-                scaleWidthField.clear();
-                scaleHeightField.clear();
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText("Please enter only numbers for the scale dimensions!");
-                a.showAndWait();
-                return;
-            }
-        }
-
-        // Ask user to select image
-        FileChooser input = new FileChooser();
-        input.setTitle("Select image to Waifu2X");
-        input.setInitialDirectory(new File(inputPath));
-        input.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.webp"));
-
-        // Add all images to list if user is stitching
-        File f = input.showOpenDialog(title.getScene().getWindow());
-        if (f == null) {
-            return;
-        }
-
-        if (nameField.getText().isEmpty()) {
-            nameField.setText(generateString(10));
-        }
-
-        ArrayList<String> cmd = new ArrayList<>();
-        cmd.add(waifuField.getText().substring(0, waifuField.getLength()-1));
-        cmd.add("-i");
-        cmd.add("\"" + f.getAbsolutePath() + "\"");
-        cmd.add("-o");
-        cmd.add("\"" + outputField.getText() + nameField.getText() + "." + fileOption + "\"");
-
-        if (modelOption.equalsIgnoreCase("CAFFE")) {
-            // NOISE AND SCALE
-            cmd.add("-m");
-            if (denoiseBox.isSelected() && scaleBox.isSelected()) {
-                cmd.add("noise_scale");
-                if (!shf.isEmpty() && !swf.isEmpty()) {
-                    cmd.add("-h");
-                    cmd.add(shf);
-                    cmd.add("-w");
-                    cmd.add(swf);
-                } else if (sf != 1) {
-                    cmd.add("-s");
-                    cmd.add(sf + "");
-                }
-                cmd.add("noise");
-                cmd.add("-n");
-                cmd.add(((int) denoiseSlider.getValue()) + "");
-            }
-            // ONLY NOISE
-            else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
-                cmd.add("noise");
-                cmd.add("-n");
-                cmd.add(((int) denoiseSlider.getValue()) + "");
-            } else if (scaleBox.isSelected() && denoiseBox.isSelected()) {
-                cmd.add("scale");
-                if (!shf.isEmpty() && !swf.isEmpty()) {
-                    cmd.add("-h");
-                    cmd.add(shf);
-                    cmd.add("-w");
-                    cmd.add(swf);
-                } else if (sf != 1) {
-                    cmd.add("-s");
-                    cmd.add(sf + "");
-                }
-            }
-            cmd.add("--model_dir");
-            cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
-        }
-        else if (modelOption.equalsIgnoreCase("VULKAN")) {
-            if (denoiseBox.isSelected()) {
-                cmd.add("-n");
-                cmd.add(((int) denoiseSlider.getValue()) + "");
-                cmd.add("-s");
-                cmd.add("1");
-            }
-            if (scaleBox.isSelected()) {
-                cmd.add("-s");
-                cmd.add(Math.pow(2, sf) + "");
-            }
-            cmd.add("-m");
-            cmd.add(new File(waifuField.getText()).getParent() + File.separator + modelOptions.getValue());
-        }
-
-        try {
-            Process p = new ProcessBuilder(cmd).start();
-            p.waitFor();
-
-        } catch (IOException | InterruptedException ex) {
-            ex.printStackTrace();
+        // Something went wrong
+        else if (!waifuHelper(null)) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setHeaderText(null);
-            a.setContentText("Error using Waifu2X! Please create an issue on the github page!");
+            a.setContentText("Error using Waifu2X!");
             a.showAndWait();
         }
-
-        Alert a2 = new Alert(Alert.AlertType.INFORMATION);
-        a2.setHeaderText(null);
-        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
-            a2.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue() + " and scaled by " + (int)Math.pow(2, sf) + "!");
-        } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
-            a2.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue());
-        } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
-            a2.setContentText("Image has been scaled by " + sf + "!");
-        }
-        a2.showAndWait();
     }
 
     // Denoise box toggled
@@ -668,41 +564,54 @@ public class Controller implements Initializable {
 
     // Dropdown button pressed
     public void onDrop(MouseEvent e) {
+        double height = mainPane.getScene().getWindow().getHeight();
         switch (((Button)e.getSource()).getId()) {
             case "dropBTN1":
+                // Closing waifuPane
                 if (waifuPane.isVisible()) {
                     waifuPane.setVisible(false);
                     ((Button) e.getSource()).setText("\uD83E\uDC1A");
                     mainPane.getRowConstraints().get(8).setPrefHeight(0);
+                    mainPane.getScene().getWindow().setHeight(height - 200);
                 }
+                // Opening waifuPane
                 else {
                     waifuPane.setVisible(true);
                     ((Button) e.getSource()).setText("\uD83E\uDC0B");
                     mainPane.getRowConstraints().get(8).setPrefHeight(200);
+                    mainPane.getScene().getWindow().setHeight(height + 200);
                 }
                 break;
             case "dropBTN2":
+                // Closing actionPane
                 if (actionPane.isVisible()) {
                     actionPane.setVisible(false);
                     ((Button) e.getSource()).setText("\uD83E\uDC1A");
                     mainPane.getRowConstraints().get(10).setPrefHeight(0);
+                    mainPane.getScene().getWindow().setHeight(height - 120);
                 }
+                // Opening actionPane
                 else {
                     actionPane.setVisible(true);
                     ((Button) e.getSource()).setText("\uD83E\uDC0B");
                     mainPane.getRowConstraints().get(10).setPrefHeight(120);
+                    mainPane.getScene().getWindow().setHeight(height + 120);
                 }
                 break;
             case "dropBTN3":
+                // Closing watermarkPane
                 if (watermarkPane.isVisible()) {
                     watermarkPane.setVisible(false);
                     ((Button) e.getSource()).setText("\uD83E\uDC1A");
                     mainPane.getRowConstraints().get(12).setPrefHeight(0);
+                    mainPane.getScene().getWindow().setHeight(height - 70);
                 }
+                // Opening watermark pane
                 else {
                     watermarkPane.setVisible(true);
                     ((Button) e.getSource()).setText("\uD83E\uDC0B");
                     mainPane.getRowConstraints().get(12).setPrefHeight(70);
+                    mainPane.getScene().getWindow().setHeight(height + 70);
                 }
                 break;
             default:
@@ -906,143 +815,28 @@ public class Controller implements Initializable {
     public void doStitchSplit(ArrayList<BufferedImage> images) throws IOException {
         String option = stitchSplitOptions.getValue();
 
-        // Stitch vertically first
-        int concat = 0;
-        int curr = 0;
-        boolean stitchVert = option.equalsIgnoreCase(options[0]) || option.equalsIgnoreCase(options[1]) || option.equalsIgnoreCase(options[2]);
+        boolean vert = option.equalsIgnoreCase(options[0]) || option.equalsIgnoreCase(options[1]) || option.equalsIgnoreCase(options[2]);
 
-        // STITCH
-        for (BufferedImage b : images) {
-            if (stitchVert) {
-                concat += b.getHeight();
-            } else {
-                concat += b.getWidth();
-            }
-            Graphics2D g2d = b.createGraphics();
-            g2d.dispose();
-        }
-        BufferedImage concatImage;
-        if (stitchVert) {
-            concatImage = new BufferedImage(images.get(0).getWidth(), concat, BufferedImage.TYPE_INT_RGB);
-        } else {
-            concatImage = new BufferedImage(concat, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
-        }
-        Graphics2D g2d = concatImage.createGraphics();
+        BufferedImage image = stitchHelper(images, vert);
 
-        // Draws the images on the Graphics2D
-        for (BufferedImage b : images) {
-            if (stitchVert) {
-                g2d.drawImage(b, 0, curr, null);
-                curr += b.getHeight();
-            } else {
-                g2d.drawImage(b, curr, 0, null);
-                curr += b.getWidth();
-            }
-        }
-        g2d.dispose();
-
-        int splitAction = -1;
         // Smart Split = 0
-        if (option.equalsIgnoreCase(options[0]) || option.equalsIgnoreCase(options[3])) {
-            splitAction = 0;
-        }
         // Split horizontally = 1
-        if (option.equalsIgnoreCase(options[1]) || option.equalsIgnoreCase(options[4])) {
-            splitAction = 1;
-        }
         // Split vertically = 2
-        if (option.equalsIgnoreCase(options[2]) || option.equalsIgnoreCase(options[5])) {
-            splitAction = 2;
+        int splitType = -1;
+        if (option.equalsIgnoreCase(options[0]) || option.equalsIgnoreCase(options[3])) {
+            splitType = 0;
+        }
+        else if (option.equalsIgnoreCase(options[1]) || option.equalsIgnoreCase(options[4])) {
+            splitType = 1;
+        }
+        else if (option.equalsIgnoreCase(options[2]) || option.equalsIgnoreCase(options[5])){
+            splitType = 2;
         }
 
-
-        // Split vertically or split horizontally
-        if (splitAction == 1 || splitAction == 2) {
-            // Ask user how many images the image is to be split into
-            TextInputDialog input = new TextInputDialog();
-            input.setHeaderText(null);
-            input.setContentText("How many images would you like the image to be split into?");
-            input.showAndWait();
-            if (input.getResult() == null) {
-                return;
-            }
-            int num = 0;
-            boolean cont = true;
-            while (cont) {
-                try {
-                    num = Integer.parseInt(input.getResult());
-                } catch (NumberFormatException nfe) {
-                    Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setHeaderText(null);
-                    a.setContentText("Please input numbers only!");
-                    a.showAndWait();
-                    continue;
-                }
-
-                if (num < 2) {
-                    Alert a = new Alert(Alert.AlertType.ERROR);
-                    a.setHeaderText(null);
-                    a.setContentText("Please input a number that is at least 2!");
-                    a.showAndWait();
-                } else {
-                    cont = false;
-                }
-            }
-
-            JFrame frame = new JFrame();
-            frame.setTitle("Split Preview");
-            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
-
-            int i = 1;
-            new File(outputPath + File.separator + "StitchTool" + File.separator).mkdirs();
-
-            // Split horizontally
-            if (splitAction == 1) {
-                int r = concatImage.getHeight() % num;
-                int parts = (concatImage.getHeight() - r) / num;
-
-                // Exports the images into a folder
-                for (int y = 0; y < concatImage.getHeight() - r; y += parts) {
-                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
-                    ImageIO.write(concatImage.getSubimage(0, y, concatImage.getWidth(), parts), outputPNG(), f);
-                    if (doWaifu(f)) {
-                        f.delete();
-                    }
-                }
-
-                // Exports the remainder if split unevenly
-                if (r != 0) {
-                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
-                    ImageIO.write(concatImage.getSubimage(0, concatImage.getHeight() - (parts * num), concatImage.getWidth(), r), outputPNG(), f);
-                    if (doWaifu(f)) {
-                        f.delete();
-                    }
-                }
-            }
-
-            // Split vertically
-            else {
-                int r = concatImage.getWidth() % num;
-                int parts = concatImage.getWidth() / num;
-
-                // Exports the images into a folder
-                for (int x = 0; x < (concatImage.getWidth() - r); x += parts) {
-                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
-                    ImageIO.write(concatImage.getSubimage(x, 0, parts, concatImage.getHeight()), outputPNG(), f);
-                    if (doWaifu(f)) {
-                        f.delete();
-                    }
-                }
-
-                // Exports the remainder if split unevenly
-                if (r != 0) {
-                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
-                    ImageIO.write(concatImage.getSubimage(concatImage.getWidth() - (parts * num), 0, concatImage.getHeight(), r), outputPNG(), f);
-                    if (doWaifu(f)) {
-                        f.delete();
-                    }
-                }
-            }
+        int num = askSplitImages();
+        // Split horizontally or vertically
+        if (splitType == 1 || splitType == 2) {
+            splitHelper(image, num, splitType == 1);
 
             // Finished message
             Alert a = new Alert(Alert.AlertType.CONFIRMATION);
@@ -1054,55 +848,23 @@ public class Controller implements Initializable {
         }
 
         // Smart split
-        if (splitAction == 0) {
-            doSmartSplit(concatImage);
+        if (splitType == 0) {
+            doSmartSplit(image);
         }
 
     }
 
     // Stitches an ArrayList of images vertically/horizontally
     public void doStitch(ArrayList<BufferedImage> images) throws IOException {
-        int concat = 0;
-        int curr = 0;
-        for (BufferedImage b : images) {
-            if (vertical.isSelected()) {
-                concat += b.getHeight();
-            }
-            else if (horizontal.isSelected()) {
-                concat += b.getWidth();
-            }
-            Graphics2D g2d = b.createGraphics();
-            g2d.dispose();
-        }
-
-        BufferedImage concatImage;
-
-        if (vertical.isSelected()) {
-            concatImage = new BufferedImage(images.get(0).getWidth(), concat, BufferedImage.TYPE_INT_RGB);
-        } else {
-            concatImage = new BufferedImage(concat, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
-        }
-
-        Graphics2D g2d = concatImage.createGraphics();
-
-        // Draws the images on the Graphics2D
-        for (BufferedImage b : images) {
-            if (vertical.isSelected()) {
-                g2d.drawImage(b, 0, curr, null);
-                curr += b.getHeight();
-            }
-            else if (horizontal.isSelected()) {
-                g2d.drawImage(b, curr, 0, null);
-                curr += b.getWidth();
-            }
-        }
-        g2d.dispose();
+        boolean vert = vertical.isSelected();
+        BufferedImage image = stitchHelper(images, vert);
 
         // Exports the image
-        File f = new File(outputPath + nameField.getText() + "." + outputPNG());
-        ImageIO.write(concatImage, outputPNG(), f);
+        File f = new File(outputPath + nameField.getText() + "." + fileOption);
+        ImageIO.write(image, fileOption, f);
 
-        if (doWaifu(f)) {
+        // Waifus the image if necessary
+        if (waifuHelper(f)) {
             f.delete();
         }
 
@@ -1113,115 +875,33 @@ public class Controller implements Initializable {
     }
 
     // Splits a BufferedImage vertically/horizontally
-    public void doImageSplit(BufferedImage source) throws IOException {
+    public void doImageSplit(BufferedImage image) throws IOException {
         JFrame frame = new JFrame();
         frame.setTitle("Split Preview");
         frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
-        boolean split = true;
-        int num = 0;
 
-        while (split) {
-            // Asks the user how many images they want
-            TextInputDialog input = new TextInputDialog();
-            input.setHeaderText(null);
-            input.setContentText("How many images would you like the image to be split into?");
-            input.showAndWait();
-            if (input.getResult() == null) {
-                return;
-            }
+        boolean vert = vertical.isSelected();
+        int num = askSplitImages();
 
-            // Checks if the input is a number
+        // Preview image if it is small enough
+        while (true) {
             try {
-                num = Integer.parseInt(input.getResult());
-            } catch (NumberFormatException nfe) {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText("Please input numbers only!");
-                a.showAndWait();
-                continue;
+                previewImage(frame, image, num);
+            } catch (Exception ex) {
+                break;
             }
 
-            // Makes sure they're not inputting negative numbers or trying to split into 1 image (?)
-            if (num < 2) {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText("Please input a number that is at least 2!");
-                a.showAndWait();
-            } else {
-                // Creates a preview of the window
-                boolean showedPreview = true;
-                try {
-                    previewImage(frame, source, num);
-                } catch (Exception e) {
-                    showedPreview = false;
-                    e.printStackTrace();
-                }
-
-                Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-                a.setHeaderText(null);
-                if (showedPreview) {
-                    a.setContentText("Continue with these splits?");
-                } else {
-                    a.setContentText("Image too large to preview");
-                }
-                a.showAndWait();
-                if (a.getResult().getText().equalsIgnoreCase("OK")) {
-                    split = false;
-                }
-                frame.dispose();
+            Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+            a.setHeaderText(null);
+            a.setContentText("Continue with these splits?");
+            a.showAndWait();
+            if (a.getResult().getText().equalsIgnoreCase("OK")) {
+                break;
             }
         }
+        frame.dispose();
 
-        int i = 1;
-        new File(outputPath + File.separator + "StitchTool" + File.separator).mkdirs();
-
-        // Horizontal
-        if (horizontal.isSelected()) {
-            int r = source.getHeight() % num;
-            int parts = (source.getHeight() - r) / num;
-
-            // Exports the images into a folder
-            for (int y = 0; y < source.getHeight() - r; y += parts) {
-                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
-                ImageIO.write(source.getSubimage(0, y, source.getWidth(), parts), outputPNG(), f);
-                if (doWaifu(f)) {
-                    f.delete();
-                }
-            }
-
-            // Exports the remainder if split unevenly
-            if (r != 0) {
-                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
-                ImageIO.write(source.getSubimage(0, source.getHeight() - (parts * num), source.getWidth(), r), outputPNG(), f);
-                if (doWaifu(f)) {
-                    f.delete();
-                }
-            }
-        }
-
-        // Vertical
-        else {
-            int r = source.getWidth() % num;
-            int parts = source.getWidth() / num;
-
-            // Exports the images into a folder
-            for (int x = 0; x < (source.getWidth() - r); x += parts) {
-                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
-                ImageIO.write(source.getSubimage(x, 0, parts, source.getHeight()), outputPNG(), f);
-                if (doWaifu(f)) {
-                    f.delete();
-                }
-            }
-
-            // Exports the remainder if split unevenly
-            if (r != 0) {
-                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
-                ImageIO.write(source.getSubimage(source.getWidth() - (parts * num), 0, source.getHeight(), r), outputPNG(), f);
-                if (doWaifu(f)) {
-                    f.delete();
-                }
-            }
-        }
+        splitHelper(image, num, vert);
 
         // Finished message
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
@@ -1232,49 +912,20 @@ public class Controller implements Initializable {
 
     // Splits a BufferedImage by space (row of same colored pixels)
     public void doSmartSplit(BufferedImage source) throws IOException {
-        boolean split = true;
-        int num = 0;
-        while (split) {
-            // Asks the user how many images they want
-            TextInputDialog input = new TextInputDialog();
-            input.setHeaderText(null);
-            input.setContentText("How many images would you like the image to be split into? (±1)");
-            input.showAndWait();
-            if (input.getResult() == null) {
-                return;
-            }
-            // Checks if the input is a number
-            try {
-                num = Integer.parseInt(input.getResult());
-            } catch (NumberFormatException nfe) {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText("Please input numbers only!");
-                a.showAndWait();
-                continue;
-            }
-
-            // Makes sure they're not inputting negative numbers or trying to split into 1 image (?)
-            if (num < 2) {
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText("Please input a number that is at least 2!");
-                a.showAndWait();
-            } else {
-                split = false;
-            }
-        }
+        int num = askSplitImages();
 
         // Approximate size of each image
         int startHeight = source.getHeight() / num;
         ArrayList<Integer> splitHeights = new ArrayList<>();
-        // Starts from 0
         splitHeights.add(0);
 
         for (int i = startHeight; i < source.getHeight(); i++ ) {
             for (int j = 0; j < source.getWidth() - 1; j++) {
+                Color c1 = getColor(source.getRGB(j, i));
+                Color c2 = getColor(source.getRGB(j + 1, i));
+
                 // Checks if the row of pixels is the same color, if not, moves 1 pixel down
-                if (!ColorCompare(getColor(source.getRGB(j, i)),getColor(source.getRGB(j+1, i)))) {
+                if (!(c1.getAlpha() == c2.getAlpha() && c1.getRed() == c2.getRed() && c1.getGreen() == c2.getGreen() && c1.getBlue() == c2.getBlue())) {
                     break;
                 }
                 // Otherwise, it saves the height to split, and moves to the next part
@@ -1295,9 +946,9 @@ public class Controller implements Initializable {
 
         // Exports the images into a folder
         for (int i = 0; i < splitHeights.size() - 1; i++) {
-            File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + (i+1) + "." + outputPNG());
-            ImageIO.write(source.getSubimage(0, splitHeights.get(i), source.getWidth(), splitHeights.get(i+1) - splitHeights.get(i)), outputPNG(), f);
-            if (doWaifu(f)) {
+            File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + (i+1) + "." + fileOption);
+            ImageIO.write(source.getSubimage(0, splitHeights.get(i), source.getWidth(), splitHeights.get(i+1) - splitHeights.get(i)), fileOption, f);
+            if (waifuHelper(f)) {
                 f.delete();
             }
         }
@@ -1314,8 +965,156 @@ public class Controller implements Initializable {
         a.showAndWait();
     }
 
-    // Run waifu given a file
-    public boolean doWaifu(File f) {
+    ////////////////////
+    // Helper Methods //
+    ////////////////////
+
+    // Given an arraylist of buffered images, returns the concatenated buffered image
+    public BufferedImage stitchHelper(ArrayList<BufferedImage> images, boolean vert) {
+        int concat = 0;
+        int curr = 0;
+
+        // Calculates the total size of the stitched image
+        for (BufferedImage b : images) {
+            // Vertical
+            if (vert) {
+                concat += b.getHeight();
+            }
+            // Horizontal
+            else {
+                concat += b.getWidth();
+            }
+            Graphics2D g2d = b.createGraphics();
+            g2d.dispose();
+        }
+
+        BufferedImage concatImage;
+
+        // Vertical
+        if (vert) {
+            concatImage = new BufferedImage(images.get(0).getWidth(), concat, BufferedImage.TYPE_INT_RGB);
+        }
+        // Horizontal
+        else {
+            concatImage = new BufferedImage(concat, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
+        }
+
+        Graphics2D g2d = concatImage.createGraphics();
+
+        // Draws the images on the Graphics2D
+        for (BufferedImage b : images) {
+            // Vertical
+            if (vertical.isSelected()) {
+                g2d.drawImage(b, 0, curr, null);
+                curr += b.getHeight();
+            }
+            // Horizontal
+            else {
+                g2d.drawImage(b, curr, 0, null);
+                curr += b.getWidth();
+            }
+        }
+        g2d.dispose();
+        return concatImage;
+    }
+
+    // Ask the user how many images he wants the image to be split into
+    public int askSplitImages() {
+        int num;
+        while (true) {
+            // Asks the user how many images they want
+            TextInputDialog input = new TextInputDialog();
+            input.setHeaderText(null);
+            input.setContentText("How many images would you like the image to be split into?");
+            input.showAndWait();
+            if (input.getResult() == null) {
+                return -1;
+            }
+
+            // Checks if the input is a number
+            try {
+                num = Integer.parseInt(input.getResult());
+            } catch (NumberFormatException nfe) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("Please input numbers only!");
+                a.showAndWait();
+                continue;
+            }
+
+            // Makes sure they're not inputting negative numbers or trying to split into 1 image (?)
+            if (num < 2) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("Please input a number that is at least 2!");
+                a.showAndWait();
+            } else {
+                return num;
+            }
+        }
+    }
+
+    // Splits the image and waifus as necessary
+    public void splitHelper(BufferedImage image, int num, boolean hor) {
+        int i = 1;
+        new File(outputPath + File.separator + "StitchTool" + File.separator).mkdirs();
+
+        try {
+            // Horizontal
+            if (hor) {
+                int r = image.getHeight() % num;
+                int parts = (image.getHeight() - r) / num;
+
+                // Exports the images into a folder
+                for (int y = 0; y < image.getHeight() - r; y += parts) {
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + fileOption);
+                    ImageIO.write(image.getSubimage(0, y, image.getWidth(), parts), fileOption, f);
+                    if (waifuHelper(f)) {
+                        f.delete();
+                    }
+                }
+
+                // Exports the remainder if split unevenly
+                if (r != 0) {
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + fileOption);
+                    ImageIO.write(image.getSubimage(0, image.getHeight() - (parts * num), image.getWidth(), r), fileOption, f);
+                    if (waifuHelper(f)) {
+                        f.delete();
+                    }
+                }
+            }
+
+            // Vertical
+            else {
+                int r = image.getWidth() % num;
+                int parts = image.getWidth() / num;
+
+                // Exports the images into a folder
+                for (int x = 0; x < (image.getWidth() - r); x += parts) {
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + fileOption);
+                    ImageIO.write(image.getSubimage(x, 0, parts, image.getHeight()), fileOption, f);
+                    if (waifuHelper(f)) {
+                        f.delete();
+                    }
+                }
+
+                // Exports the remainder if split unevenly
+                if (r != 0) {
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + fileOption);
+                    ImageIO.write(image.getSubimage(image.getWidth() - (parts * num), 0, image.getHeight(), r), fileOption, f);
+                    if (waifuHelper(f)) {
+                        f.delete();
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    // Waifu2X the image
+    public boolean waifuHelper(File f) {
+        // If the waifu2x.exe is not found
         if (waifuPath == null) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setHeaderText(null);
@@ -1324,17 +1123,13 @@ public class Controller implements Initializable {
             return false;
         }
 
-        // No options chosen
         int sf = (int) scaleSlider.getValue();
         String shf = scaleHeightField.getText();
         String swf = scaleWidthField.getText();
 
-        if ((!denoiseBox.isSelected() || sf == 1) && (sf == 1 && shf.isEmpty() && swf.isEmpty())) {
-            return false;
-        }
-
+        // If shf and swf are not numbers and scale is 1
         if (!shf.isEmpty() && !swf.isEmpty() && sf == 1) {
-            if (!isNumber(shf) || !isNumber(swf)) {
+            if (isNumber(shf) || isNumber(swf)) {
                 scaleSlider.setValue(1);
                 scaleWidthField.clear();
                 scaleHeightField.clear();
@@ -1346,10 +1141,28 @@ public class Controller implements Initializable {
             }
         }
 
+        // If f is null, ask user to select image
+        if (f == null) {
+            // Ask user to select image
+            FileChooser input = new FileChooser();
+            input.setTitle("Select image to Waifu2X");
+            input.setInitialDirectory(new File(inputPath));
+            input.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.webp"));
+
+            // Add all images to list if user is stitching
+            f = input.showOpenDialog(title.getScene().getWindow());
+            if (f == null) {
+                return false;
+            }
+        }
+
+        // Generate name if empty
         if (nameField.getText().isEmpty()) {
             nameField.setText(generateString(10));
         }
 
+        // Create command argument
         ArrayList<String> cmd = new ArrayList<>();
         cmd.add(waifuField.getText().substring(0, waifuField.getLength()-1));
         cmd.add("-i");
@@ -1420,10 +1233,24 @@ public class Controller implements Initializable {
             a.setHeaderText(null);
             a.setContentText("Error using Waifu2X! Please create an issue on the github page!");
             a.showAndWait();
-            return false;
         }
+
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setHeaderText(null);
+        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+            a.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue() + " and scaled by " + (int)Math.pow(2, sf) + "!");
+        } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+            a.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue());
+        } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
+            a.setContentText("Image has been scaled by " + sf + "!");
+        }
+        a.showAndWait();
         return true;
     }
+
+    ///////////////////
+    // Other Methods //
+    ///////////////////
 
     // Gets the color of a pixel
     public Color getColor(int pixel) {
@@ -1432,11 +1259,6 @@ public class Controller implements Initializable {
         int green = (pixel >> 8) & 0xff;
         int blue = (pixel) & 0xff;
         return new Color(red, green, blue, alpha);
-    }
-
-    // Compares 2 color objects. True if same, false if not.
-    public boolean ColorCompare(Color o1, Color o2) {
-        return o1.getAlpha() == o2.getAlpha() && o1.getRed() == o2.getRed() && o1.getGreen() == o2.getGreen() && o1.getBlue() == o2.getBlue();
     }
 
     // Custom comparator class that makes sure files are in alpha-numerical order
@@ -1484,30 +1306,6 @@ public class Controller implements Initializable {
         bGr.dispose();
 
         return image;
-    }
-
-    // Custom JPanel that creates a scrollable image
-    public static class ScrollPanel extends JPanel {
-        public ScrollPanel(BufferedImage image, int num) {
-            JPanel canvas = new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    g.drawImage(image, 0, 0, null);
-
-                    int parts = image.getHeight() / num;
-
-                    for (int i = parts; i < image.getHeight() - (parts/2); i += parts) {
-                        g.setColor(Color.RED);
-                        g.drawLine(0, i, image.getWidth(), i);
-                    }
-                }
-            };
-            canvas.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-            JScrollPane sp = new JScrollPane(canvas);
-            setLayout(new BorderLayout());
-            add(sp, BorderLayout.CENTER);
-        }
     }
 
     // Creates a new JFrame that uses the ScrollPanel
@@ -1577,14 +1375,6 @@ public class Controller implements Initializable {
         }
         return s.toString();
 
-    }
-
-    // Returns file type
-    public String outputPNG() {
-        if (fileOption.equalsIgnoreCase("PNG")) {
-            return "PNG";
-        }
-        return "JPG";
     }
 
     // Checks if the String is a number
