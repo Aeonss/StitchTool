@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Properties;
 
 public class Stitch extends Application {
-    private final String version = "3.0";
+    private final String version = "3.1";
 
     @Override
     public void start(Stage window) throws Exception{
@@ -109,7 +109,7 @@ public class Stitch extends Application {
         p.setProperty("actionOption", "VERTICAL");
         p.setProperty("ssOption", "Stitch Vertically, Smart Split");
         p.setProperty("fileOption", "PNG");
-        p.setProperty("modelOption", "cunet");
+        p.setProperty("modelOption", "CAFFE");
 
         p.store(o, null);
         o.close();

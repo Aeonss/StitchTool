@@ -22,7 +22,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 ## 🔨 &nbsp; Installation
 * Make sure you have [Java 8 or above](https://jdk.java.net/archive/) installed.
 * Download the jar file from the <a href="https://github.com/Aeonss/StitchTool/releases/latest/">latest release</a> and run it with Java.
-* Any denoising or upscaling requires [Waifu2X-Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/).
+* Any denoising or upscaling requires [Waifu2X Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/) or [Waifu2X Vulkan](https://github.com/nihui/waifu2x-ncnn-vulkan/releases/latest).
 
 ## 🚀 &nbsp; Features
 * Stitch together **any** amount of images either vertically or horizontally.
@@ -31,6 +31,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 * Smart split images by free space, allowing for **<u>automatic splitting</u>** without needing to check if the image
 was split through a speech bubble or SFX.
 * Add repeatable watermarks to your images.
+* Supports [Waifu2X Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/) and [Waifu2X Vulkan](https://github.com/nihui/waifu2x-ncnn-vulkan/releases/latest) integration.
 * **<u>Denoise and/or upscale</u>** images in the program, or while stitching or splitting.
 * Supports .png, .jpg, .jpeg, and .webp!
 
@@ -42,7 +43,7 @@ was split through a speech bubble or SFX.
 3. Select the input images you want to stitch and split with the green button. You can choose an entire folder of images, or you can choose specific images.
 4. Select output location. If not selected, it defaults to the user's folder.
 5. Input the image name in the red textbox. If not inputted, it generates a random 10 character name.
-6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** or **<u>waifu2x-ncnn-vulkan</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
 7. Click the run button at the bottom.
 8. Choose the amount of images to be split into.
 
@@ -52,7 +53,7 @@ was split through a speech bubble or SFX.
 3. Select the input images you want to stitch with the green button. You can choose an entire folder of images, or you can choose specific images.
 4. Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder.
 5. Input the image name in the red textbox. If not inputted, it generates a random 10 character name.
-6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** or **<u>waifu2x-ncnn-vulkan</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
 7. Click the run button at the bottom.
 
 <h3>Splitting</h3>
@@ -61,7 +62,7 @@ was split through a speech bubble or SFX.
 3. Select the folder of images you want to split with the green button.
 4. Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder.
 5. Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-".
-6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** or **<u>waifu2x-ncnn-vulkan</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
 7. Click the run button at the bottom.
 8. Choose the amount of images to be split into.
 9. Review the preview and continue or reenter the number of images you want the image to be split into.
@@ -72,12 +73,12 @@ was split through a speech bubble or SFX.
 3. Select the folder of images you want to split.
 4. Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder.
 5. Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-".
-6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** or **<u>waifu2x-ncnn-vulkan</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
 7. Click the run button at the bottom.
 
 <h3>Denoising and/or Upscaling</h3>
 1. Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-".
-2. Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button.
+2. Import the location of **<u>waifu2x-caffe-cui.exe</u>** or **<u>waifu2x-ncnn-vulkan</u>** by clicking the pink "Import Waifu2X" button.
 3. Select the denoising level and/or scale ratio OR scale height/width.
 4. Waifu2x prioritizes scale height/width if the ratio and dimensions are given.
 5. Click the pink "Run Waifu2X" button.

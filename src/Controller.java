@@ -12,6 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.StringConverter;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -49,7 +50,7 @@ public class Controller implements Initializable {
     @FXML private Slider denoiseSlider;
     @FXML private ChoiceBox<String> modelOptions;
     @FXML private CheckBox scaleBox;
-    @FXML private TextField scaleField;
+    @FXML private Slider scaleSlider;
     @FXML private TextField scaleHeightField;
     @FXML private TextField scaleWidthField;
 
@@ -77,6 +78,9 @@ public class Controller implements Initializable {
     private String fileOption;
     private String modelOption;
 
+    private ObservableList<String> modelList;
+    private String[] caffeModels;
+    private String[] vulkanModels;
     private String[] options;
 
     // List of files
@@ -113,7 +117,9 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         final String[] files = new String[]{"PNG", "JPG"};
-        final String[] models = new String[]{"cunet", "upresnet10", "upconv_7_anime_style_art_rgb", "upconv_7_photo", "anime_style_art_rgb", "photo", "anime_style_art_y"};
+        final String[] waifuTypes = new String[]{"CAFFE", "VULKAN"};
+        caffeModels = new String[]{"cunet", "upresnet10", "upconv_7_anime_style_art_rgb", "upconv_7_photo", "anime_style_art_rgb", "photo", "anime_style_art_y"};
+        vulkanModels = new String[]{"models-cunet", "models-upconv_7_anime_style_art_rgb", "models-upconv_7_photo"};
         final String[] actions = new String[]{"STITCHSPLIT", "STITCH", "SPLIT", "SMARTSPLIT"};
         options = new String[]{"Stitch Vertically, Smart Split", "Stitch Vertically, Split Horizontally",
                 "Stitch Vertically, Split Vertically", "Stitch Horizontally, Smart Split",
@@ -161,12 +167,60 @@ public class Controller implements Initializable {
             fileOption = "PNG";
             setConfig("fileOption", "PNG");
         }
-        if (modelOption == null || !Arrays.asList(models).contains(modelOption)) {
-            modelOption = "cunet";
-            setConfig("modelOption", "cunet");
+        if (modelOption == null || !Arrays.asList(waifuTypes).contains(modelOption)) {
+            waifuPath = null;
+            setConfig("waifuPath", null);
+            waifuField.setText("");
+        }
+        if (!waifuPath.isEmpty()) {
+            if (waifuPath.contains("caffe")) {
+                modelOption = "CAFFE";
+                setConfig("modelOption", modelOption);
+            } else if (waifuPath.contains("vulkan")) {
+                modelOption = "VULKAN";
+                setConfig("modelOption", modelOption);
+            }
         }
 
+        // Default
         outputField.setText(outputPath);
+
+        scaleSlider.setLabelFormatter(new StringConverter<Double>() {
+            @Override
+            public String toString(Double t) {
+                if (t == 0) return "1";
+                if (t == 1) return "2";
+                if (t == 2) return "4";
+                if (t == 3) return "8";
+                if (t == 4) return "16";
+                return "32";
+            }
+
+            @Override
+            public Double fromString(String s) {
+                switch (s) {
+                    case "1":
+                        return 0d;
+                    case "2":
+                        return 1d;
+                    case "4":
+                        return 2d;
+                    case "8":
+                        return 3d;
+                    case "16":
+                        return 4d;
+                    default:
+                        return 5d;
+                }
+            }
+        });
+
+        scaleSlider.setMin(0);
+        scaleSlider.setMax(5);
+        scaleSlider.setMajorTickUnit(1);
+        scaleSlider.setSnapToTicks(true);
+        scaleSlider.setShowTickLabels(true);
+        scaleSlider.setShowTickMarks(true);
 
         final ObservableList<String> fileList = FXCollections.observableArrayList(files);
         fileOptions.setItems(fileList);
@@ -176,9 +230,19 @@ public class Controller implements Initializable {
         stitchSplitOptions.setItems(optionsList);
         stitchSplitOptions.setValue(ssOption);
 
-        final ObservableList<String> modelList = FXCollections.observableArrayList(models);
-        modelOptions.setItems(modelList);
-        modelOptions.setValue(modelOption);
+        if (waifuPath.contains("caffe")) {
+            modelOption = "CAFFE";
+            modelList = FXCollections.observableArrayList(caffeModels);
+            modelOptions.setItems(modelList);
+            modelOptions.setValue("cunet");
+        } else if (waifuPath.contains("vulkan")) {
+            modelOption = "VULKAN";
+            modelList = FXCollections.observableArrayList(vulkanModels);
+            modelOptions.setItems(modelList);
+            modelOptions.setValue("models-cunet");
+        } else {
+            return;
+        }
 
         switch (lastAction) {
             case "STITCHSPLIT":
@@ -408,12 +472,29 @@ public class Controller implements Initializable {
         input.setTitle("Select Folder of Images");
         input.setInitialDirectory(new File(inputPath));
         input.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Waifu2X-Caffe CUI", "*.exe"));
+                new FileChooser.ExtensionFilter("Waifu2X EXE", "*.exe"));
 
         File f = input.showOpenDialog(title.getScene().getWindow());
         if (f == null) {
             return;
         }
+
+        if (f.getName().contains("caffe")) {
+            modelOption = "CAFFE";
+            setConfig("modelOption", modelOption);
+            modelOptions.getItems().clear();
+            modelList = FXCollections.observableArrayList(caffeModels);
+            modelOptions.setItems(modelList);
+            modelOptions.setValue("cunet");
+        } else if (f.getName().contains("vulkan")) {
+            modelOption = "VULKAN";
+            setConfig("modelOption", modelOption);
+            modelOptions.getItems().clear();
+            modelList = FXCollections.observableArrayList(vulkanModels);
+            modelOptions.setItems(modelList);
+            modelOptions.setValue("models-cunet");
+        }
+
         waifuPath = f.getAbsolutePath() + File.separator;
         setConfig("waifuPath", waifuPath);
         waifuField.setText(waifuPath);
@@ -423,17 +504,17 @@ public class Controller implements Initializable {
         if (waifuPath == null) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setHeaderText(null);
-            a.setContentText("Waifu2X_caffe_cui.exe was not found!");
+            a.setContentText("Waifu2x was not found!");
             a.showAndWait();
             return;
         }
 
         // No options chosen
-        String sf = scaleField.getText();
+        int sf = (int) scaleSlider.getValue();
         String shf = scaleHeightField.getText();
         String swf = scaleWidthField.getText();
 
-        if ((!denoiseBox.isSelected() || sf.equalsIgnoreCase("1")) && (sf.isEmpty() && shf.isEmpty() && swf.isEmpty())) {
+        if ((!denoiseBox.isSelected() || sf == 1) && (sf == 1 && shf.isEmpty() && swf.isEmpty())) {
             Alert a = new Alert(Alert.AlertType.ERROR);
             a.setHeaderText(null);
             a.setContentText("No Waifu2X options were chosen!");
@@ -441,25 +522,14 @@ public class Controller implements Initializable {
             return;
         }
 
-        if (shf.isEmpty() && swf.isEmpty() && !sf.isEmpty()) {
-            if (!isNumber(sf)) {
-                scaleField.setText("1");
-                scaleWidthField.clear();
-                scaleHeightField.clear();
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText("Please enter only numbers for the scale height and width!");
-                a.showAndWait();
-                return;
-            }
-        } else if (shf.isEmpty() && !swf.isEmpty() && !sf.isEmpty()) {
+        if (!shf.isEmpty() && !swf.isEmpty() && sf == 1) {
             if (!isNumber(shf) || !isNumber(swf)) {
-                scaleField.setText("1");
+                scaleSlider.setValue(1);
                 scaleWidthField.clear();
                 scaleHeightField.clear();
                 Alert a = new Alert(Alert.AlertType.ERROR);
                 a.setHeaderText(null);
-                a.setContentText("Please enter only numbers for the scale ratio!");
+                a.setContentText("Please enter only numbers for the scale dimensions!");
                 a.showAndWait();
                 return;
             }
@@ -478,56 +548,69 @@ public class Controller implements Initializable {
             return;
         }
 
-        ArrayList<String> cmd = new ArrayList<>();
-        cmd.add(waifuField.getText().substring(0, waifuField.getLength()-1));
-        cmd.add("-i");
-        cmd.add("\"" + f.getAbsolutePath() + "\"");
-        cmd.add("-m");
-
-        // NOISE AND SCALE
-        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
-            cmd.add("noise_scale");
-            if (!shf.isEmpty() && !swf.isEmpty()) {
-                cmd.add("-h");
-                cmd.add(shf);
-                cmd.add("-w");
-                cmd.add(swf);
-            } else if (!sf.isEmpty()) {
-                cmd.add("-s");
-                cmd.add(sf);
-            }
-            cmd.add("noise");
-            cmd.add("-n");
-            cmd.add(((int) denoiseSlider.getValue()) + "");
-        }
-        // ONLY NOISE
-        else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
-            cmd.add("noise");
-            cmd.add("-n");
-            cmd.add(((int) denoiseSlider.getValue()) + "");
-        }
-        else if (scaleBox.isSelected() && denoiseBox.isSelected()) {
-            cmd.add("scale");
-            if (!shf.isEmpty() && !swf.isEmpty()) {
-                cmd.add("-h");
-                cmd.add(shf);
-                cmd.add("-w");
-                cmd.add(swf);
-            } else if (!sf.isEmpty()) {
-                cmd.add("-s");
-                cmd.add(sf);
-            }
-        }
-
         if (nameField.getText().isEmpty()) {
             nameField.setText(generateString(10));
         }
 
+        ArrayList<String> cmd = new ArrayList<>();
+        cmd.add(waifuField.getText().substring(0, waifuField.getLength()-1));
+        cmd.add("-i");
+        cmd.add("\"" + f.getAbsolutePath() + "\"");
         cmd.add("-o");
         cmd.add("\"" + outputField.getText() + nameField.getText() + "." + fileOption + "\"");
 
-        cmd.add("--model_dir");
-        cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
+        if (modelOption.equalsIgnoreCase("CAFFE")) {
+            // NOISE AND SCALE
+            cmd.add("-m");
+            if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+                cmd.add("noise_scale");
+                if (!shf.isEmpty() && !swf.isEmpty()) {
+                    cmd.add("-h");
+                    cmd.add(shf);
+                    cmd.add("-w");
+                    cmd.add(swf);
+                } else if (sf != 1) {
+                    cmd.add("-s");
+                    cmd.add(sf + "");
+                }
+                cmd.add("noise");
+                cmd.add("-n");
+                cmd.add(((int) denoiseSlider.getValue()) + "");
+            }
+            // ONLY NOISE
+            else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+                cmd.add("noise");
+                cmd.add("-n");
+                cmd.add(((int) denoiseSlider.getValue()) + "");
+            } else if (scaleBox.isSelected() && denoiseBox.isSelected()) {
+                cmd.add("scale");
+                if (!shf.isEmpty() && !swf.isEmpty()) {
+                    cmd.add("-h");
+                    cmd.add(shf);
+                    cmd.add("-w");
+                    cmd.add(swf);
+                } else if (sf != 1) {
+                    cmd.add("-s");
+                    cmd.add(sf + "");
+                }
+            }
+            cmd.add("--model_dir");
+            cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
+        }
+        else if (modelOption.equalsIgnoreCase("VULKAN")) {
+            if (denoiseBox.isSelected()) {
+                cmd.add("-n");
+                cmd.add(((int) denoiseSlider.getValue()) + "");
+                cmd.add("-s");
+                cmd.add("1");
+            }
+            if (scaleBox.isSelected()) {
+                cmd.add("-s");
+                cmd.add(Math.pow(2, sf) + "");
+            }
+            cmd.add("-m");
+            cmd.add(new File(waifuField.getText()).getParent() + File.separator + modelOptions.getValue());
+        }
 
         try {
             Process p = new ProcessBuilder(cmd).start();
@@ -544,11 +627,11 @@ public class Controller implements Initializable {
         Alert a2 = new Alert(Alert.AlertType.INFORMATION);
         a2.setHeaderText(null);
         if (denoiseBox.isSelected() && scaleBox.isSelected()) {
-            a2.setContentText("Image has been successfully denoised with level " + (int)denoiseSlider.getValue() + "and scaled by " + scaleField.getText() + "!");
+            a2.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue() + " and scaled by " + (int)Math.pow(2, sf) + "!");
         } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
-            a2.setContentText("Image has been successfully denoised with level " + (int)denoiseSlider.getValue());
+            a2.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue());
         } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
-            a2.setContentText("Image has been successfully scaled by " + scaleField.getText() + "!");
+            a2.setContentText("Image has been scaled by " + sf + "!");
         }
         a2.showAndWait();
     }
@@ -569,12 +652,12 @@ public class Controller implements Initializable {
     // Scale box toggled
     public void onScale() {
         if (scaleBox.isSelected()) {
-            scaleField.setDisable(false);
+            scaleSlider.setDisable(false);
             scaleHeightField.setDisable(false);
             scaleWidthField.setDisable(false);
             modelOptions.setDisable(false);
         } else {
-            scaleField.setDisable(true);
+            scaleSlider.setDisable(true);
             scaleHeightField.setDisable(true);
             scaleWidthField.setDisable(true);
         }
@@ -1234,76 +1317,24 @@ public class Controller implements Initializable {
     // Run waifu given a file
     public boolean doWaifu(File f) {
         // No options chosen
-        String sf = scaleField.getText();
+        int sf = (int) scaleSlider.getValue();
         String shf = scaleHeightField.getText();
         String swf = scaleWidthField.getText();
 
-        if ((!denoiseBox.isSelected() || sf.equalsIgnoreCase("1")) && (sf.isEmpty() && shf.isEmpty() && swf.isEmpty())) {
+        if ((!denoiseBox.isSelected() || sf == 1) && (sf == 1 && shf.isEmpty() && swf.isEmpty())) {
             return false;
         }
 
-        if (shf.isEmpty() && swf.isEmpty() && !sf.isEmpty()) {
-            if (!isNumber(sf)) {
-                scaleField.setText("1");
-                scaleWidthField.clear();
-                scaleHeightField.clear();
-                Alert a = new Alert(Alert.AlertType.ERROR);
-                a.setHeaderText(null);
-                a.setContentText("Please enter only numbers for the scale height and width!");
-                a.showAndWait();
-                return false;
-            }
-        } else if (shf.isEmpty() && !swf.isEmpty() && !sf.isEmpty()) {
+        if (!shf.isEmpty() && !swf.isEmpty() && sf == 1) {
             if (!isNumber(shf) || !isNumber(swf)) {
-                scaleField.setText("1");
+                scaleSlider.setValue(1);
                 scaleWidthField.clear();
                 scaleHeightField.clear();
                 Alert a = new Alert(Alert.AlertType.ERROR);
                 a.setHeaderText(null);
-                a.setContentText("Please enter only numbers for the scale ratio!");
+                a.setContentText("Please enter only numbers for the scale dimensions!");
                 a.showAndWait();
                 return false;
-            }
-        }
-
-        ArrayList<String> cmd = new ArrayList<>();
-        cmd.add(waifuField.getText());
-        cmd.add("-i");
-        cmd.add("\"" + f.getAbsolutePath() + "\"");
-        cmd.add("-m");
-
-        // NOISE AND SCALE
-        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
-            cmd.add("noise_scale");
-            if (!shf.isEmpty() && !swf.isEmpty()) {
-                cmd.add("-h");
-                cmd.add(shf);
-                cmd.add("-w");
-                cmd.add(swf);
-            } else if (!sf.isEmpty()) {
-                cmd.add("-s");
-                cmd.add(sf);
-            }
-            cmd.add("noise");
-            cmd.add("-n");
-            cmd.add(((int) denoiseSlider.getValue()) + "");
-        }
-        // ONLY NOISE
-        else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
-            cmd.add("noise");
-            cmd.add("-n");
-            cmd.add(((int) denoiseSlider.getValue()) + "");
-        }
-        else if (scaleBox.isSelected() && !denoiseBox.isSelected()) {
-            cmd.add("scale");
-            if (!shf.isEmpty() && !swf.isEmpty()) {
-                cmd.add("-h");
-                cmd.add(shf);
-                cmd.add("-w");
-                cmd.add(swf);
-            } else {
-                cmd.add("-s");
-                cmd.add(sf);
             }
         }
 
@@ -1311,11 +1342,65 @@ public class Controller implements Initializable {
             nameField.setText(generateString(10));
         }
 
+        ArrayList<String> cmd = new ArrayList<>();
+        cmd.add(waifuField.getText().substring(0, waifuField.getLength()-1));
+        cmd.add("-i");
+        cmd.add("\"" + f.getAbsolutePath() + "\"");
         cmd.add("-o");
-        cmd.add("\"" + outputField.getText() + f.getName().replaceFirst("[.][^.]+$", "") + "_waifu" + "." + fileOption + "\"");
+        cmd.add("\"" + outputField.getText() + nameField.getText() + "." + fileOption + "\"");
 
-        cmd.add("--model_dir");
-        cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
+        if (modelOption.equalsIgnoreCase("CAFFE")) {
+            // NOISE AND SCALE
+            cmd.add("-m");
+            if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+                cmd.add("noise_scale");
+                if (!shf.isEmpty() && !swf.isEmpty()) {
+                    cmd.add("-h");
+                    cmd.add(shf);
+                    cmd.add("-w");
+                    cmd.add(swf);
+                } else if (sf != 1) {
+                    cmd.add("-s");
+                    cmd.add(sf + "");
+                }
+                cmd.add("noise");
+                cmd.add("-n");
+                cmd.add(((int) denoiseSlider.getValue()) + "");
+            }
+            // ONLY NOISE
+            else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+                cmd.add("noise");
+                cmd.add("-n");
+                cmd.add(((int) denoiseSlider.getValue()) + "");
+            } else if (scaleBox.isSelected() && denoiseBox.isSelected()) {
+                cmd.add("scale");
+                if (!shf.isEmpty() && !swf.isEmpty()) {
+                    cmd.add("-h");
+                    cmd.add(shf);
+                    cmd.add("-w");
+                    cmd.add(swf);
+                } else if (sf != 1) {
+                    cmd.add("-s");
+                    cmd.add(sf + "");
+                }
+            }
+            cmd.add("--model_dir");
+            cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
+        }
+        else if (modelOption.equalsIgnoreCase("VULKAN")) {
+            if (denoiseBox.isSelected()) {
+                cmd.add("-n");
+                cmd.add(((int) denoiseSlider.getValue()) + "");
+                cmd.add("-s");
+                cmd.add("1");
+            }
+            if (scaleBox.isSelected()) {
+                cmd.add("-s");
+                cmd.add(Math.pow(2, sf) + "");
+            }
+            cmd.add("-m");
+            cmd.add(new File(waifuField.getText()).getParent() + File.separator + modelOptions.getValue());
+        }
 
         try {
             Process p = new ProcessBuilder(cmd).start();

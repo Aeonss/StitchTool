@@ -200,19 +200,19 @@
                   </ChoiceBox>
                   <CheckBox fx:id="scaleBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onScale" prefHeight="30.0" prefWidth="80.0" text="Scale" textFill="WHITE">
                      <FlowPane.margin>
-                        <Insets bottom="20.0" right="23.0" top="30.0" />
+                        <Insets bottom="20.0" right="5.0" top="30.0" />
                      </FlowPane.margin>
                   </CheckBox>
-                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Scale Ratio">
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Scale">
                      <FlowPane.margin>
                         <Insets right="5.0" top="10.0" />
                      </FlowPane.margin>
                   </Text>
-                  <TextField fx:id="scaleField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="50.0" promptText="Scale Ratio" text="1">
+                  <Slider fx:id="scaleSlider" blockIncrement="1.0" majorTickUnit="1.0" max="6.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="0" prefHeight="10.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" snapToTicks="true">
                      <FlowPane.margin>
-                        <Insets bottom="20.0" right="20.0" top="30.0" />
+                        <Insets right="10.0" top="30.0" />
                      </FlowPane.margin>
-                  </TextField>
+                  </Slider>
                   <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Height">
                      <FlowPane.margin>
                         <Insets right="5.0" top="10.0" />
@@ -220,7 +220,7 @@
                   </Text>
                   <TextField fx:id="scaleHeightField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="110.0" promptText="Scale Height">
                      <FlowPane.margin>
-                        <Insets bottom="20.0" right="20.0" top="30.0" />
+                        <Insets bottom="20.0" right="5.0" top="30.0" />
                      </FlowPane.margin>
                   </TextField>
                   <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Width">
