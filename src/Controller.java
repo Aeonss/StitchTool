@@ -6,6 +6,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -34,6 +37,21 @@ public class Controller implements Initializable {
     @FXML private Button inputImagesBTN;
     @FXML private TextField outputField;
     @FXML private TextField nameField;
+    @FXML private ChoiceBox<String> fileOptions;
+
+    @FXML private GridPane mainPane;
+    @FXML private FlowPane waifuPane;
+    @FXML private FlowPane actionPane;
+    @FXML private FlowPane watermarkPane;
+
+    @FXML private TextField waifuField;
+    @FXML private CheckBox denoiseBox;
+    @FXML private Slider denoiseSlider;
+    @FXML private ChoiceBox<String> modelOptions;
+    @FXML private CheckBox scaleBox;
+    @FXML private TextField scaleField;
+    @FXML private TextField scaleHeightField;
+    @FXML private TextField scaleWidthField;
 
     @FXML private RadioButton stitchSplit;
     @FXML private RadioButton stitch;
@@ -50,11 +68,14 @@ public class Controller implements Initializable {
     // Read from config
     private String inputPath;
     private String outputPath;
+    private String waifuPath;
     private String imagePath;
     private String watermarkPath;
     private String lastAction;
     private String actionOption;
     private String ssOption;
+    private String fileOption;
+    private String modelOption;
 
     private String[] options;
 
@@ -66,29 +87,33 @@ public class Controller implements Initializable {
     private final FilenameFilter IMAGE_FILTER = (dir, name) -> {
         for (final String ext : EXTENSIONS) {
             if (name.endsWith("." + ext)) {
-                return (true);
+                return true;
             }
         }
-        return (false);
+        return false;
     };
 
     // Default Constructor
     public Controller() {
         inputPath = getConfig("inputPath");
         outputPath = getConfig("outputPath");
+        waifuPath = getConfig("waifuPath");
         imagePath = getConfig("imagePath");
         watermarkPath = getConfig("watermarkPath");
         lastAction = getConfig("lastAction");
         actionOption = getConfig("actionOption");
         ssOption = getConfig("ssOption");
+        fileOption = getConfig("fileOption");
+        modelOption = getConfig("modelOption");
         files = new ArrayList<>();
     }
 
     // Called after constructor
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        greyOption.setTranslateY(10);
-        greyOption.setTranslateY(0);
+
+        final String[] files = new String[]{"PNG", "JPG"};
+        final String[] models = new String[]{"cunet", "upresnet10", "upconv_7_anime_style_art_rgb", "upconv_7_photo", "anime_style_art_rgb", "photo", "anime_style_art_y"};
         final String[] actions = new String[]{"STITCHSPLIT", "STITCH", "SPLIT", "SMARTSPLIT"};
         options = new String[]{"Stitch Vertically, Smart Split", "Stitch Vertically, Split Horizontally",
                 "Stitch Vertically, Split Vertically", "Stitch Horizontally, Smart Split",
@@ -101,41 +126,59 @@ public class Controller implements Initializable {
         File f3 = new File(imagePath);
         File f4 = new File(watermarkPath);
 
-        if (getConfig("inputPath") == null || !f1.isDirectory()) {
+        if (inputPath == null || !f1.isDirectory()) {
             inputPath = System.getProperty("user.home") + File.separator;
             setConfig("inputPath", inputPath);
         }
-        if (getConfig("outputPath") == null || !f2.isDirectory()) {
+        if (outputPath == null || !f2.isDirectory()) {
             outputPath = System.getProperty("user.home") + File.separator;
             setConfig("outputPath", outputPath);
         }
-        if (getConfig("imagePath") == null || !f3.isDirectory()) {
+        if (getConfig("waifuPath") != null) {
+            waifuField.setText(waifuPath);
+        }
+        if (imagePath == null || !f3.isDirectory()) {
             imagePath = System.getProperty("user.home") + File.separator;
             setConfig("imagePath", imagePath);
         }
-        if (getConfig("watermarkPath") == null || !f4.isDirectory()) {
+        if (watermarkPath == null || !f4.isDirectory()) {
             watermarkPath = System.getProperty("user.home") + File.separator;
             setConfig("watermarkPath", watermarkPath);
         }
-        if (getConfig("lastAction") == null || !Arrays.asList(actions).contains(getConfig("lastAction"))) {
+        if (lastAction == null || !Arrays.asList(actions).contains(lastAction)) {
             lastAction = "STITCHSPLIT";
             setConfig("lastAction", lastAction);
         }
-        if (getConfig("actionOption") == null || !getConfig("actionOption").equalsIgnoreCase("VERTICAL") || !getConfig("actionOption").equalsIgnoreCase("HORIZONTAL")) {
+        if (actionOption == null) {
             actionOption = "VERTICAL";
             setConfig("actionOption", actionOption);
         }
-        if (getConfig("ssOption") == null || !Arrays.asList(options).contains(getConfig("ssOption"))) {
+        if (ssOption == null || !Arrays.asList(options).contains(ssOption)) {
             ssOption = "Stitch Vertically, Smart Split";
             setConfig("ssOption", ssOption);
         }
+        if (fileOption == null || !Arrays.asList(files).contains(fileOption)) {
+            fileOption = "PNG";
+            setConfig("fileOption", "PNG");
+        }
+        if (modelOption == null || !Arrays.asList(models).contains(modelOption)) {
+            modelOption = "cunet";
+            setConfig("modelOption", "cunet");
+        }
 
-        inputField.setText(inputPath);
         outputField.setText(outputPath);
+
+        final ObservableList<String> fileList = FXCollections.observableArrayList(files);
+        fileOptions.setItems(fileList);
+        fileOptions.setValue(fileOption);
 
         final ObservableList<String> optionsList = FXCollections.observableArrayList(options);
         stitchSplitOptions.setItems(optionsList);
         stitchSplitOptions.setValue(ssOption);
+
+        final ObservableList<String> modelList = FXCollections.observableArrayList(models);
+        modelOptions.setItems(modelList);
+        modelOptions.setValue(modelOption);
 
         switch (lastAction) {
             case "STITCHSPLIT":
@@ -151,7 +194,23 @@ public class Controller implements Initializable {
                 smartSplit.setSelected(true);
                 break;
         }
+
+        if (actionOption.equalsIgnoreCase("VERTICAL")) {
+            vertical.isSelected();
+        }
+        else if (actionOption.equalsIgnoreCase("HORIZONTAL")) {
+            horizontal.isSelected();
+        }
+
+        if (fileOption.equalsIgnoreCase("PNG")) {
+            fileOptions.setValue("PNG");
+        } else {
+            fileOptions.setValue("JPG");
+        }
+
         updateGUI();
+        onDenoise();
+        onScale();
     }
 
     // Updates the GUI when action is switched
@@ -213,7 +272,7 @@ public class Controller implements Initializable {
                 inputImagesBTN.setText("Import Image");
                 inputFolderBTN.setVisible(false);
                 inputImagesBTN.setPrefWidth(220);
-                inputImagesBTN.setTranslateX(310);
+                inputImagesBTN.setTranslateX(330);
                 inputImagesBTN.setTranslateY(-50);
                 vertical.setDisable(false);
                 horizontal.setDisable(false);
@@ -223,7 +282,7 @@ public class Controller implements Initializable {
                 inputImagesBTN.setText("Import Image");
                 inputFolderBTN.setVisible(false);
                 inputImagesBTN.setPrefWidth(220);
-                inputImagesBTN.setTranslateX(310);
+                inputImagesBTN.setTranslateX(330);
                 inputImagesBTN.setTranslateY(-50);
                 vertical.setDisable(true);
                 horizontal.setDisable(true);
@@ -342,6 +401,232 @@ public class Controller implements Initializable {
         setConfig("outputPath", outputPath);
     }
 
+    // Waifu button pressed
+    public void onWaifu() {
+        // Ask user to select
+        FileChooser input = new FileChooser();
+        input.setTitle("Select Folder of Images");
+        input.setInitialDirectory(new File(inputPath));
+        input.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Waifu2X-Caffe CUI", "*.exe"));
+
+        File f = input.showOpenDialog(title.getScene().getWindow());
+        if (f == null) {
+            return;
+        }
+        waifuPath = f.getAbsolutePath() + File.separator;
+        setConfig("waifuPath", waifuPath);
+        waifuField.setText(waifuPath);
+    }
+
+    public void onRunWaifu() {
+        if (waifuPath == null) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Waifu2X_caffe_cui.exe was not found!");
+            a.showAndWait();
+            return;
+        }
+
+        // No options chosen
+        String sf = scaleField.getText();
+        String shf = scaleHeightField.getText();
+        String swf = scaleWidthField.getText();
+
+        if ((!denoiseBox.isSelected() || sf.equalsIgnoreCase("1")) && (sf.isEmpty() && shf.isEmpty() && swf.isEmpty())) {
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("No Waifu2X options were chosen!");
+            a.showAndWait();
+            return;
+        }
+
+        if (shf.isEmpty() && swf.isEmpty() && !sf.isEmpty()) {
+            if (!isNumber(sf)) {
+                scaleField.setText("1");
+                scaleWidthField.clear();
+                scaleHeightField.clear();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("Please enter only numbers for the scale height and width!");
+                a.showAndWait();
+                return;
+            }
+        } else if (shf.isEmpty() && !swf.isEmpty() && !sf.isEmpty()) {
+            if (!isNumber(shf) || !isNumber(swf)) {
+                scaleField.setText("1");
+                scaleWidthField.clear();
+                scaleHeightField.clear();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("Please enter only numbers for the scale ratio!");
+                a.showAndWait();
+                return;
+            }
+        }
+
+        // Ask user to select image
+        FileChooser input = new FileChooser();
+        input.setTitle("Select image to Waifu2X");
+        input.setInitialDirectory(new File(inputPath));
+        input.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.webp"));
+
+        // Add all images to list if user is stitching
+        File f = input.showOpenDialog(title.getScene().getWindow());
+        if (f == null) {
+            return;
+        }
+
+        ArrayList<String> cmd = new ArrayList<>();
+        cmd.add(waifuField.getText().substring(0, waifuField.getLength()-1));
+        cmd.add("-i");
+        cmd.add("\"" + f.getAbsolutePath() + "\"");
+        cmd.add("-m");
+
+        // NOISE AND SCALE
+        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+            cmd.add("noise_scale");
+            if (!shf.isEmpty() && !swf.isEmpty()) {
+                cmd.add("-h");
+                cmd.add(shf);
+                cmd.add("-w");
+                cmd.add(swf);
+            } else if (!sf.isEmpty()) {
+                cmd.add("-s");
+                cmd.add(sf);
+            }
+            cmd.add("noise");
+            cmd.add("-n");
+            cmd.add(((int) denoiseSlider.getValue()) + "");
+        }
+        // ONLY NOISE
+        else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+            cmd.add("noise");
+            cmd.add("-n");
+            cmd.add(((int) denoiseSlider.getValue()) + "");
+        }
+        else if (scaleBox.isSelected() && denoiseBox.isSelected()) {
+            cmd.add("scale");
+            if (!shf.isEmpty() && !swf.isEmpty()) {
+                cmd.add("-h");
+                cmd.add(shf);
+                cmd.add("-w");
+                cmd.add(swf);
+            } else if (!sf.isEmpty()) {
+                cmd.add("-s");
+                cmd.add(sf);
+            }
+        }
+
+        if (nameField.getText().isEmpty()) {
+            nameField.setText(generateString(10));
+        }
+
+        cmd.add("-o");
+        cmd.add("\"" + outputField.getText() + nameField.getText() + "." + fileOption + "\"");
+
+        cmd.add("--model_dir");
+        cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
+
+        try {
+            Process p = new ProcessBuilder(cmd).start();
+            p.waitFor();
+
+        } catch (IOException | InterruptedException ex) {
+            ex.printStackTrace();
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Error using Waifu2X! Please create an issue on the github page!");
+            a.showAndWait();
+        }
+
+        Alert a2 = new Alert(Alert.AlertType.INFORMATION);
+        a2.setHeaderText(null);
+        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+            a2.setContentText("Image has been successfully denoised with level " + (int)denoiseSlider.getValue() + "and scaled by " + scaleField.getText() + "!");
+        } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+            a2.setContentText("Image has been successfully denoised with level " + (int)denoiseSlider.getValue());
+        } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
+            a2.setContentText("Image has been successfully scaled by " + scaleField.getText() + "!");
+        }
+        a2.showAndWait();
+    }
+
+    // Denoise box toggled
+    public void onDenoise() {
+        if (denoiseBox.isSelected()) {
+            denoiseSlider.setDisable(false);
+            modelOptions.setDisable(false);
+        } else {
+            denoiseSlider.setDisable(true);
+        }
+        if (!denoiseBox.isSelected() && !scaleBox.isSelected()) {
+            modelOptions.setDisable(true);
+        }
+    }
+
+    // Scale box toggled
+    public void onScale() {
+        if (scaleBox.isSelected()) {
+            scaleField.setDisable(false);
+            scaleHeightField.setDisable(false);
+            scaleWidthField.setDisable(false);
+            modelOptions.setDisable(false);
+        } else {
+            scaleField.setDisable(true);
+            scaleHeightField.setDisable(true);
+            scaleWidthField.setDisable(true);
+        }
+        if (!denoiseBox.isSelected() && !scaleBox.isSelected()) {
+            modelOptions.setDisable(true);
+        }
+    }
+
+    // Dropdown button pressed
+    public void onDrop(MouseEvent e) {
+        switch (((Button)e.getSource()).getId()) {
+            case "dropBTN1":
+                if (waifuPane.isVisible()) {
+                    waifuPane.setVisible(false);
+                    ((Button) e.getSource()).setText("\uD83E\uDC1A");
+                    mainPane.getRowConstraints().get(8).setPrefHeight(0);
+                }
+                else {
+                    waifuPane.setVisible(true);
+                    ((Button) e.getSource()).setText("\uD83E\uDC0B");
+                    mainPane.getRowConstraints().get(8).setPrefHeight(200);
+                }
+                break;
+            case "dropBTN2":
+                if (actionPane.isVisible()) {
+                    actionPane.setVisible(false);
+                    ((Button) e.getSource()).setText("\uD83E\uDC1A");
+                    mainPane.getRowConstraints().get(10).setPrefHeight(0);
+                }
+                else {
+                    actionPane.setVisible(true);
+                    ((Button) e.getSource()).setText("\uD83E\uDC0B");
+                    mainPane.getRowConstraints().get(10).setPrefHeight(120);
+                }
+                break;
+            case "dropBTN3":
+                if (watermarkPane.isVisible()) {
+                    watermarkPane.setVisible(false);
+                    ((Button) e.getSource()).setText("\uD83E\uDC1A");
+                    mainPane.getRowConstraints().get(12).setPrefHeight(0);
+                }
+                else {
+                    watermarkPane.setVisible(true);
+                    ((Button) e.getSource()).setText("\uD83E\uDC0B");
+                    mainPane.getRowConstraints().get(12).setPrefHeight(70);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     // Run button pressed
     public void onRun() {
         // No images in list
@@ -404,7 +689,7 @@ public class Controller implements Initializable {
                 lastAction = "STITCH";
             }
             else if (split.isSelected()) {
-                imageSplit(images.get(0));
+                doImageSplit(images.get(0));
                 lastAction = "SPLIT";
             }
             else if (smartSplit.isSelected()) {
@@ -419,9 +704,15 @@ public class Controller implements Initializable {
                 actionOption = "HORIZONTAL";
             }
             setConfig("actionOption", actionOption);
+            setConfig("fileOption", fileOption);
+            setConfig("modelOption", modelOption);
 
         } catch (IOException ex) {
             ex.printStackTrace();
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Error Running! Please create an issue on the github page!");
+            a.showAndWait();
         }
     }
 
@@ -521,6 +812,10 @@ public class Controller implements Initializable {
             a.showAndWait();
         } catch (IOException ex) {
             ex.printStackTrace();
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Error watermarking! Please create an issue on the github page!");
+            a.showAndWait();
         }
     }
 
@@ -625,14 +920,20 @@ public class Controller implements Initializable {
 
                 // Exports the images into a folder
                 for (int y = 0; y < concatImage.getHeight() - r; y += parts) {
-                    ImageIO.write(concatImage.getSubimage(0, y, concatImage.getWidth(), parts), "PNG",
-                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + ".png"));
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
+                    ImageIO.write(concatImage.getSubimage(0, y, concatImage.getWidth(), parts), outputPNG(), f);
+                    if (doWaifu(f)) {
+                        f.delete();
+                    }
                 }
 
                 // Exports the remainder if split unevenly
                 if (r != 0) {
-                    ImageIO.write(concatImage.getSubimage(0, concatImage.getHeight() - (parts * num), concatImage.getWidth(), r), "PNG",
-                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + ".png"));
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
+                    ImageIO.write(concatImage.getSubimage(0, concatImage.getHeight() - (parts * num), concatImage.getWidth(), r), outputPNG(), f);
+                    if (doWaifu(f)) {
+                        f.delete();
+                    }
                 }
             }
 
@@ -643,14 +944,20 @@ public class Controller implements Initializable {
 
                 // Exports the images into a folder
                 for (int x = 0; x < (concatImage.getWidth() - r); x += parts) {
-                    ImageIO.write(concatImage.getSubimage(x, 0, parts, concatImage.getHeight()), "PNG",
-                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + ".png"));
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
+                    ImageIO.write(concatImage.getSubimage(x, 0, parts, concatImage.getHeight()), outputPNG(), f);
+                    if (doWaifu(f)) {
+                        f.delete();
+                    }
                 }
 
                 // Exports the remainder if split unevenly
                 if (r != 0) {
-                    ImageIO.write(concatImage.getSubimage(concatImage.getWidth() - (parts * num), 0, concatImage.getHeight(), r), "PNG",
-                            new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + ".png"));
+                    File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
+                    ImageIO.write(concatImage.getSubimage(concatImage.getWidth() - (parts * num), 0, concatImage.getHeight(), r), outputPNG(), f);
+                    if (doWaifu(f)) {
+                        f.delete();
+                    }
                 }
             }
 
@@ -689,13 +996,10 @@ public class Controller implements Initializable {
 
         if (vertical.isSelected()) {
             concatImage = new BufferedImage(images.get(0).getWidth(), concat, BufferedImage.TYPE_INT_RGB);
-        }
-        else if (horizontal.isSelected()) {
-            concatImage = new BufferedImage(concat, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
         } else {
-            System.out.println("Stitched image missing!");
-            return;
+            concatImage = new BufferedImage(concat, images.get(0).getHeight(), BufferedImage.TYPE_INT_RGB);
         }
+
         Graphics2D g2d = concatImage.createGraphics();
 
         // Draws the images on the Graphics2D
@@ -712,7 +1016,13 @@ public class Controller implements Initializable {
         g2d.dispose();
 
         // Exports the image
-        ImageIO.write(concatImage, "PNG", new File(outputPath + nameField.getText() + ".png"));
+        File f = new File(outputPath + nameField.getText() + "." + outputPNG());
+        ImageIO.write(concatImage, outputPNG(), f);
+
+        if (doWaifu(f)) {
+            f.delete();
+        }
+
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
         a.setHeaderText(null);
         a.setContentText(files.size() + " images were successfully stitched!");
@@ -720,7 +1030,7 @@ public class Controller implements Initializable {
     }
 
     // Splits a BufferedImage vertically/horizontally
-    public void imageSplit(BufferedImage source) throws IOException {
+    public void doImageSplit(BufferedImage source) throws IOException {
         JFrame frame = new JFrame();
         frame.setTitle("Split Preview");
         frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("icon.png")));
@@ -782,37 +1092,51 @@ public class Controller implements Initializable {
         int i = 1;
         new File(outputPath + File.separator + "StitchTool" + File.separator).mkdirs();
 
+        // Horizontal
         if (horizontal.isSelected()) {
             int r = source.getHeight() % num;
             int parts = (source.getHeight() - r) / num;
 
             // Exports the images into a folder
             for (int y = 0; y < source.getHeight() - r; y += parts) {
-                ImageIO.write(source.getSubimage(0, y, source.getWidth(), parts), "PNG",
-                        new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + ".png"));
+                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
+                ImageIO.write(source.getSubimage(0, y, source.getWidth(), parts), outputPNG(), f);
+                if (doWaifu(f)) {
+                    f.delete();
+                }
             }
 
             // Exports the remainder if split unevenly
             if (r != 0) {
-                ImageIO.write(source.getSubimage(0, source.getHeight() - (parts * num), source.getWidth(), r), "PNG",
-                        new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + ".png"));
+                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
+                ImageIO.write(source.getSubimage(0, source.getHeight() - (parts * num), source.getWidth(), r), outputPNG(), f);
+                if (doWaifu(f)) {
+                    f.delete();
+                }
             }
         }
 
-        else if (vertical.isSelected()) {
+        // Vertical
+        else {
             int r = source.getWidth() % num;
             int parts = source.getWidth() / num;
 
             // Exports the images into a folder
             for (int x = 0; x < (source.getWidth() - r); x += parts) {
-                ImageIO.write(source.getSubimage(x, 0, parts, source.getHeight()), "PNG",
-                        new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + ".png"));
+                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i++ + "." + outputPNG());
+                ImageIO.write(source.getSubimage(x, 0, parts, source.getHeight()), outputPNG(), f);
+                if (doWaifu(f)) {
+                    f.delete();
+                }
             }
 
             // Exports the remainder if split unevenly
             if (r != 0) {
-            ImageIO.write(source.getSubimage(source.getWidth() - (parts * num), 0, source.getHeight(), r), "PNG",
-                    new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + ".png"));
+                File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + i + "." + outputPNG());
+                ImageIO.write(source.getSubimage(source.getWidth() - (parts * num), 0, source.getHeight(), r), outputPNG(), f);
+                if (doWaifu(f)) {
+                    f.delete();
+                }
             }
         }
 
@@ -888,8 +1212,11 @@ public class Controller implements Initializable {
 
         // Exports the images into a folder
         for (int i = 0; i < splitHeights.size() - 1; i++) {
-            ImageIO.write(source.getSubimage(0, splitHeights.get(i), source.getWidth(), splitHeights.get(i+1) - splitHeights.get(i)), "PNG",
-                    new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + (i+1) + ".png"));
+            File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + (i+1) + "." + outputPNG());
+            ImageIO.write(source.getSubimage(0, splitHeights.get(i), source.getWidth(), splitHeights.get(i+1) - splitHeights.get(i)), outputPNG(), f);
+            if (doWaifu(f)) {
+                f.delete();
+            }
         }
 
         // Finished message
@@ -902,6 +1229,107 @@ public class Controller implements Initializable {
             a.setContentText(splitHeights.size() - 1 + " images were successfully created!");
         }
         a.showAndWait();
+    }
+
+    // Run waifu given a file
+    public boolean doWaifu(File f) {
+        // No options chosen
+        String sf = scaleField.getText();
+        String shf = scaleHeightField.getText();
+        String swf = scaleWidthField.getText();
+
+        if ((!denoiseBox.isSelected() || sf.equalsIgnoreCase("1")) && (sf.isEmpty() && shf.isEmpty() && swf.isEmpty())) {
+            return false;
+        }
+
+        if (shf.isEmpty() && swf.isEmpty() && !sf.isEmpty()) {
+            if (!isNumber(sf)) {
+                scaleField.setText("1");
+                scaleWidthField.clear();
+                scaleHeightField.clear();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("Please enter only numbers for the scale height and width!");
+                a.showAndWait();
+                return false;
+            }
+        } else if (shf.isEmpty() && !swf.isEmpty() && !sf.isEmpty()) {
+            if (!isNumber(shf) || !isNumber(swf)) {
+                scaleField.setText("1");
+                scaleWidthField.clear();
+                scaleHeightField.clear();
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("Please enter only numbers for the scale ratio!");
+                a.showAndWait();
+                return false;
+            }
+        }
+
+        ArrayList<String> cmd = new ArrayList<>();
+        cmd.add(waifuField.getText());
+        cmd.add("-i");
+        cmd.add("\"" + f.getAbsolutePath() + "\"");
+        cmd.add("-m");
+
+        // NOISE AND SCALE
+        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+            cmd.add("noise_scale");
+            if (!shf.isEmpty() && !swf.isEmpty()) {
+                cmd.add("-h");
+                cmd.add(shf);
+                cmd.add("-w");
+                cmd.add(swf);
+            } else if (!sf.isEmpty()) {
+                cmd.add("-s");
+                cmd.add(sf);
+            }
+            cmd.add("noise");
+            cmd.add("-n");
+            cmd.add(((int) denoiseSlider.getValue()) + "");
+        }
+        // ONLY NOISE
+        else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+            cmd.add("noise");
+            cmd.add("-n");
+            cmd.add(((int) denoiseSlider.getValue()) + "");
+        }
+        else if (scaleBox.isSelected() && !denoiseBox.isSelected()) {
+            cmd.add("scale");
+            if (!shf.isEmpty() && !swf.isEmpty()) {
+                cmd.add("-h");
+                cmd.add(shf);
+                cmd.add("-w");
+                cmd.add(swf);
+            } else {
+                cmd.add("-s");
+                cmd.add(sf);
+            }
+        }
+
+        if (nameField.getText().isEmpty()) {
+            nameField.setText(generateString(10));
+        }
+
+        cmd.add("-o");
+        cmd.add("\"" + outputField.getText() + f.getName().replaceFirst("[.][^.]+$", "") + "_waifu" + "." + fileOption + "\"");
+
+        cmd.add("--model_dir");
+        cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
+
+        try {
+            Process p = new ProcessBuilder(cmd).start();
+            p.waitFor();
+
+        } catch (IOException | InterruptedException ex) {
+            ex.printStackTrace();
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Error using Waifu2X! Please create an issue on the github page!");
+            a.showAndWait();
+            return false;
+        }
+        return true;
     }
 
     // Gets the color of a pixel
@@ -933,7 +1361,6 @@ public class Controller implements Initializable {
                 char c2 = split2[i].charAt(0);
                 int cmp = 0;
 
-
                 if (c1 >= '0' && c1 <= '9' && c2 >= '0' && c2 <= '9') {
                     cmp = new BigInteger(split1[i]).compareTo(new BigInteger(split2[i]));
                 }
@@ -945,7 +1372,6 @@ public class Controller implements Initializable {
                     return cmp;
                 }
             }
-
             return split1.length - split2.length;
         }
     }
@@ -1019,6 +1445,10 @@ public class Controller implements Initializable {
             i.close();
         } catch (IOException ex) {
             ex.printStackTrace();
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Error getting the config! Please create an issue on the github page!");
+            a.showAndWait();
         }
         return p.getProperty(key);
     }
@@ -1037,6 +1467,10 @@ public class Controller implements Initializable {
             o.close();
         } catch (IOException ex) {
             ex.printStackTrace();
+            Alert a = new Alert(Alert.AlertType.ERROR);
+            a.setHeaderText(null);
+            a.setContentText("Error writing to the config! Please create an issue on the github page!");
+            a.showAndWait();
         }
     }
 
@@ -1046,10 +1480,27 @@ public class Controller implements Initializable {
         StringBuilder s = new StringBuilder();
         Random r = new Random();
         for (int i = 0; i < n; i++) {
-            s.append(chars.charAt(r.nextInt(chars.length() + 1)));
+            s.append(chars.charAt(r.nextInt(chars.length())));
         }
         return s.toString();
 
     }
 
+    // Returns file type
+    public String outputPNG() {
+        if (fileOption.equalsIgnoreCase("PNG")) {
+            return "PNG";
+        }
+        return "JPG";
+    }
+
+    // Checks if the String is a number
+    public boolean isNumber(String s) {
+        try {
+            Double.parseDouble(s);
+            return true;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
 }

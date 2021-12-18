@@ -1,92 +1,55 @@
-![](https://i.imgur.com/97hD6U9.png)
+<p align="center"><img src="https://i.imgur.com/QwItpe6.png" width="200" height="200"/></p>
 
-## Features
+<h1 align="center">StitchTool</h1>
 
-This program is for anyone wanting to easily and quickly stitch/split images horizontally/vertically,
-but is mainly for Webtoons Creators and translation groups
-(specifically for raw providers / cleaners and redrawers / quality checkers).
+<font size="3"><a href="https://github.com/Aeonss/StitchTool/releases/latest/">StitchTool</a> is simple and intuitive program for webtoons creators and translation groups to stitch or
+split large quantities of images. It has a variety of features and tools to make this process easier, such as a <strong><u>smart
+splitter</u></strong> and <strong><u>integrated denoiser and upscaler</u></strong>.</font>
 
-**Stitch Tool** allows you to:
-* Stitch together __any__ amount of images either vertically or 
-horizontally
+<br>
+<p align="center">
+<a href="https://github.com/Aeonss/StitchTool/releases/latest/"><img src="https://img.shields.io/github/v/release/Aeonss/StitchTool?style=for-the-badge&label=%20%F0%9F%93%A3%20Latest%20release&color=778beb&labelColor=2f3542"/></a>
+<img src="https://img.shields.io/github/stars/Aeonss/StitchTool?style=for-the-badge&label=%E2%AD%90%20Stars&color=786fa6&labelColor=2f3542"/>
+<img src="https://img.shields.io/github/downloads/Aeonss/StitchTool/total.svg?style=for-the-badge&label=%E2%AC%87%EF%B8%8FDownloads&color=4b6584&labelColor=2f3542"/>
+</p>
 
-* Split an image into __any__ amount of images either vertically or horizontally
+<br>
+<p align="center"><img src="https://i.imgur.com/2i5lcxn.png" width="350" height="450"/></p>
 
+
+<font size="3">
+
+## 🔨 &nbsp; Installation
+* Make sure you have [Java 8 or above](https://jdk.java.net/archive/) installed.
+* Download the jar file from the <a href="https://github.com/Aeonss/StitchTool/releases/latest/">latest release</a> and run it with Java.
+* Any denoising or upscaling requires [Waifu2X-Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/).
+
+## 🚀 &nbsp; Features
+* Stitch together **any** amount of images either vertically or horizontally.
+* Split an image into **any** amount of images either vertically or horizontally.
 * Preview image before splitting, which is shown by a red line in a separate window.
-* (Will not show if the image is too large)
-
-* Smart split images by free space, allowing for fast splitting without needing to check if the image
+* Smart split images by free space, allowing for **<u>automatic</u>** splitting without needing to check if the image
 was split through a speech bubble or SFX.
+* Add repeatable watermarks to your images.
+* Denoise or upscale images while stitching or splitting.
 
-* Stitch and split in one go, with the ability to stitch (horizontally/vertically) and split (horizontally/vertically/smart split)
-
-* Choose a folder of images or just select several images while stitching/splitting
-
-* Add repeatable watermarks to your images
-
-* Autofill the directories you worked in as well as the previous action and options used for a faster work speed
-
-## How To Use (General)
-
-1. Select the action (purple radio buttons) you want to do
-
-2. Select the options (grey radio buttons or drop down menu) for the action
-
+## 📝 &nbsp; How To Use
+1. Select the action (aqua buttons).
+2. Select the options (blue buttons) for the action.
 3. Select the input images. You can choose an entire folder of images (stitching only), or you can choose specific images.
+4. Select output location. If not selected, it defaults to the user's folder.
+5. Input the image name (red textbox). If not inputted, it generates a random 10 character name.
+6. (Optional) Select the **<u>waifu2x-caffe-cui.exe</u>** location to denoise and/or resize.
+7. Click the run button.
 
-4. (Optional) Select output folder. It defaults to the user's folder.
+## ✅ &nbsp; Additional Information
+* StitchTool was compiled with **Java 17** and **JavaFX 17**.
+* StitchTool will stitch together images that are named in *alphanumerical order*.
+* Collapse sections with the arrow button next to the line separator.
+* Waifu2X Caffe prioritizes **scale height and width over scale ratio**.
+* Please request any features or report any bugs in [issues](https://github.com/Aeonss/StitchTool/issues).
 
-5. (Optional) Input the image name (red textbox). It defaults to a random 10 character mix of letters and numbers otherwise.
+## 📘 &nbsp; License
+StitchTool is released under the [MIT license](https://github.com/Aeonss/StitchTool/blob/master/LICENSE.md).
 
-6. Click the run button.
-
-## How To Use (Smart Split)
-
-This feature is specifically used for splitting Webtoons, and splits a long image based on "free space", which is
-determined by a row of pixels that have the same color. Therefore, this works on any part of a Webtoon, even if it has
-an off-white or black background.
-
-1. Select "Smart Split" (purple radio button)
-
-2. Select the input image, and the amount of images you would like it to be split into.
-
-3. (Optional) Select output folder. It defaults to the user's folder.
-
-4. (Optional) Input the image name (Red Textbox). It defaults to "StitchTool-#" when
-   splitting.
-
-5. Click the run button.
-
-## How To Use (Watermark)
-
-1. (Optional) Change the opacity percentage and/or greyscale checkbox.
-
-2. Click the "Add Watermark" button.
-
-3. Choose the image to add a watermark on.
-
-4. Choose the watermark image.
-
-5. Choose the amount of times you want the watermark to appear.
-
-## Additional Information
-
-* StitchTool was compiled with Java 17 and JavaFX 15.
-
-* Java 8 or above is needed to run this!
-  https://jdk.java.net/archive/
-
-* StitchTool will stitch together images that are named in alphanumerical order.
-
-* StitchTool is extremely fast, being able to stitch together 80 (720x1098) images in *less than 5 seconds!*
-
-## TO DO
-
-* Allow users to change the outfile type (Defaults to PNG)
-* Add GIF support
-
-## License
-StitchTool is licensed under the MIT license. See the file LICENSE for more information. 
-If you plan to use any part of this source code in your own code, 
-I would be grateful if you would include some form of credit somewhere.
-
+</font>

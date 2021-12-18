@@ -14,14 +14,14 @@ import java.net.URL;
 import java.util.Properties;
 
 public class Stitch extends Application {
-    private final String version = "2.0";
+    private final String version = "3.0";
 
     @Override
     public void start(Stage window) throws Exception{
         initialization();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("stitch.fxml"));
         Parent root = loader.load();
-        Scene scene = new Scene(root, 700, 700);
+        Scene scene = new Scene(root, 700, 900);
 
         window.setTitle("Stitch Tool v" + version + " by Aeon");
         window.setResizable(false);
@@ -33,7 +33,7 @@ public class Stitch extends Application {
         try {
             checkVersion();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            // ex.printStackTrace();
         }
     }
 
@@ -102,11 +102,14 @@ public class Stitch extends Application {
         OutputStream o = new FileOutputStream(name);
         p.setProperty("inputPath", System.getProperty("user.home") + File.separator);
         p.setProperty("outputPath", System.getProperty("user.home") + File.separator);
+        p.setProperty("waifuPath", null);
         p.setProperty("imagePath", System.getProperty("user.home") + File.separator);
         p.setProperty("watermarkPath", System.getProperty("user.home") + File.separator);
         p.setProperty("lastAction", "STITCHSPLIT");
         p.setProperty("actionOption", "VERTICAL");
         p.setProperty("ssOption", "Stitch Vertically, Smart Split");
+        p.setProperty("fileOption", "PNG");
+        p.setProperty("modelOption", "cunet");
 
         p.store(o, null);
         o.close();

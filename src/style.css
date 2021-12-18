@@ -5,17 +5,6 @@
     -fx-border-color: linear-gradient(to top left, #12d6df, #f70fff);
 }
 
-/* Title */
-#title {
-    -fx-font-weight: 200;
-}
-
-/* Focused input field */
-#inputField:focused{
-    -fx-prompt-text-fill: #a9a9a9;
-}
-
-/* Text Field */
 .text-field {
     -fx-border-width: 2;
     -fx-background-color: null;
@@ -28,7 +17,6 @@
     -fx-highlight-text-fill: null;
 }
 
-/* Button */
 .button {
     -fx-border-width: 2;
     -fx-background-color: null;
@@ -37,101 +25,99 @@
     -fx-border-radius: 24;
 }
 
-/* Hover over button */
 .button:hover {
     -fx-border-color: #1abc9c;
     -fx-background-radius: 24;
     -fx-background-color: #1abc9c;
+    -fx-cursor: hand;
 }
 
-/* Stitch/Split dropdown */
-#stitchSplitOptions {
+.check-box {
+    -fx-border-color: #f1c40f;
     -fx-border-width: 2;
     -fx-background-color: null;
-    -fx-border-color: #34495e;
     -fx-text-fill: white;
     -fx-border-radius: 24;
     -fx-padding: 5 10 5 10;
 }
 
-/* Stitch/Split */
+.choice-box {
+    -fx-border-width: 2;
+    -fx-background-color: null;
+    -fx-text-fill: white;
+    -fx-border-radius: 24;
+    -fx-padding: 5 10 5 10;
+}
+
 .choice-box .label {
     -fx-text-fill: white;
 }
 
-/* Stitch/Split label */
 .choice-box .menu-item .label {
     -fx-text-fill: black;
 }
 
-/* Vertical button */
-#vertical {
-    -fx-border-color: #34495e;
-}
-
-/* Horizontal button */
-#horizontal {
-    -fx-border-color: #34495e;
-}
-
-/* Name field */
-#nameField {
-    -fx-border-color: #e74c3c;
-}
-
-/* Focused name field */
-#nameField:focused {
-    -fx-padding: 0 0 0 -105;
-    -fx-border-insets: 0 0 0 -125;
-    -fx-background-insets: 0 0 0 -125;
-    -fx-pref-width: 425;
-}
-
-/* Radio button */
 .radio-button {
     -fx-border-width: 2;
     -fx-background-color: null;
-    -fx-border-color: #9b59b6;
+    -fx-border-color: #81ecec;
     -fx-text-fill: white;
     -fx-border-radius: 24;
     -fx-padding: 5 10 5 10;
 }
 
-/* Opacity slider */
 .slider .axis {
     -fx-tick-label-fill: white;
 }
 
-/* Greyscale checkbox */
-#greyOption {
-    -fx-border-width: 2;
-    -fx-background-color: null;
-    -fx-border-color: #f1c40f;
-    -fx-text-fill: white;
-    -fx-border-radius: 24;
-    -fx-padding: 5 10 5 10;
+
+
+
+#title {
+    -fx-font-weight: 200;
 }
 
-/* Watermark button */
+#nameField, #fileOptions {
+    -fx-border-color: #e74c3c;
+}
+
+#waifuField, #scaleField, #scaleHeightField, #scaleWidthField, #denoiseBox, #scaleBox, #modelOptions {
+    -fx-border-color: #a29bfe;
+}
+
+#runWaifuBTN, #waifuBTN {
+    -fx-border-color: #fd79a8;
+}
+#runWaifuBTN:hover, #waifuBTN:hover {
+    -fx-background-radius: 24;
+    -fx-background-color: #fd79a8;
+}
+
+#stitchSplitOptions, #vertical, #horizontal {
+    -fx-border-color: #74b9ff;
+}
+
 #watermarkBTN {
     -fx-border-color: #f1c40f;
 }
-
-/* Hovering over watermark button */
 #watermarkBTN:hover {
-    -fx-border-color: #f1c40f;
     -fx-background-radius: 24;
     -fx-background-color: #f1c40f;
 }
 
-/* Run button */
 #runBTN {
     -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
 }
-
-/* Hover over run button */
 #runBTN:hover {
     -fx-border-color: linear-gradient(to top left, #ff7f50, #6a5acd);
     -fx-background-radius: 24;
     -fx-background-color: linear-gradient(to top left, #ff7f50, #6a5acd);
+}
+
+#dropBTN1, #dropBTN2, #dropBTN3 {
+    -fx-border-color: null;
+}
+
+#dropBTN1:hover, #dropBTN2:hover, #dropBTN3:hover {
+    -fx-background-color: null;
 }
