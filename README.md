@@ -28,19 +28,69 @@ splitter</u></strong> and <strong><u>integrated denoiser and upscaler</u></stron
 * Stitch together **any** amount of images either vertically or horizontally.
 * Split an image into **any** amount of images either vertically or horizontally.
 * Preview image before splitting, which is shown by a red line in a separate window.
-* Smart split images by free space, allowing for **<u>automatic</u>** splitting without needing to check if the image
+* Smart split images by free space, allowing for **<u>automatic splitting</u>** without needing to check if the image
 was split through a speech bubble or SFX.
 * Add repeatable watermarks to your images.
-* Denoise or upscale images while stitching or splitting.
+* **<u>Denoise and/or upscale</u>** images while stitching or splitting.
 
 ## 📝 &nbsp; How To Use
-1. Select the action (aqua buttons).
-2. Select the options (blue buttons) for the action.
-3. Select the input images. You can choose an entire folder of images (stitching only), or you can choose specific images.
+
+<h3>Stitching and Splitting</h3>
+1. Select the "Stitch/Split" teal radio button 
+2. From the blue dropdown menu, select the specific option you want.
+3. Select the input images you want to stitch and split. You can choose an entire folder of images, or you can choose specific images.
 4. Select output location. If not selected, it defaults to the user's folder.
-5. Input the image name (red textbox). If not inputted, it generates a random 10 character name.
-6. (Optional) Select the **<u>waifu2x-caffe-cui.exe</u>** location to denoise and/or resize.
-7. Click the run button.
+5. Input the image name in the red textbox. If not inputted, it generates a random 10 character name.
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+7. Click the run button at the bottom.
+8. Choose the amount of images to be split into.
+
+<h3>Stitching</h3>
+1. Select the "Stitch" teal radio button
+2. Select the "Vertical" or "Horizontal" blue radio button
+3. Select the input images you want to stitch. You can choose an entire folder of images, or you can choose specific images.
+4. Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder.
+5. Input the image name in the red textbox. If not inputted, it generates a random 10 character name.
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+7. Click the run button at the bottom.
+
+<h3>Splitting</h3>
+1. Select the "Split" teal radio button
+2. From the blue dropdown menu, select the specific option you want.
+3. Select the folder of images you want to split.
+4. Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder.
+5. Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-".
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+7. Click the run button at the bottom.
+8. Choose the amount of images to be split into.
+9. Review the preview and continue or reenter the number of images you want the image to be split into.
+
+<h3>Smart Splitting</h3>
+1. Select the "Split" teal radio button
+2. From the blue dropdown menu, select the specific option you want.
+3. Select the folder of images you want to split.
+4. Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder.
+5. Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-".
+6. (Optional) Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process.
+7. Click the run button at the bottom.
+
+<h3>Denoising and/or Upscaling</h3>
+1. Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-".
+2. Import the location of **<u>waifu2x-caffe-cui.exe</u>** by clicking the pink "Import Waifu2X" button.
+3. Select the denoising level and/or scale ratio OR scale height/width
+4. Waifu2x prioritizes scale height/width if the ratio and dimensions are given.
+5. Click the pink "Run Waifu2X" button.
+6. Click the run button at the bottom.
+
+<h3>Watermarking</h3>
+1. Select output location with the green "Browse Output Location" button
+2. Input the image name in the red textbox. If not inputted, it generates a random 10 character name.
+3. Select the opacity of the watermark using the opacity slider.
+4. Select if you want the watermark to be greyscale or not with the yellow checkbox.
+5. Click the yellow watermark button.
+6. Select the image you want the watermark to be on.
+7. Select the watermark image.
+8. Input the number of times you want the watermark to appear.
 
 ## ✅ &nbsp; Additional Information
 * StitchTool was compiled with **Java 17** and **JavaFX 17**.
