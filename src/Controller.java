@@ -116,7 +116,6 @@ public class Controller implements Initializable {
 
         // Final values
         final String[] files = new String[]{"PNG", "JPG"};
-        final String[] waifus = new String[]{"CAFFE", "VULKAN"};
         caffeModels = new String[]{"cunet", "upresnet10", "upconv_7_anime_style_art_rgb", "upconv_7_photo", "anime_style_art_rgb", "photo", "anime_style_art_y"};
         vulkanModels = new String[]{"models-cunet", "models-upconv_7_anime_style_art_rgb", "models-upconv_7_photo"};
         final String[] actions = new String[]{"STITCHSPLIT", "STITCH", "SPLIT", "SMARTSPLIT"};
@@ -130,22 +129,22 @@ public class Controller implements Initializable {
         File f4 = new File(watermarkPath);
 
         // Checks to make sure the config is not null or has any invalid values
-        if (inputPath == null || f1 == null || !f1.isDirectory()) {
+        if (inputPath == null || !f1.isDirectory()) {
             inputPath = System.getProperty("user.home") + File.separator;
             setConfig("inputPath", inputPath);
         }
-        if (outputPath == null || f2 == null || !f2.isDirectory()) {
+        if (outputPath == null || !f2.isDirectory()) {
             outputPath = System.getProperty("user.home") + File.separator;
             setConfig("outputPath", outputPath);
         }
         if (getConfig("waifuPath") != null) {
             waifuField.setText(waifuPath);
         }
-        if (imagePath == null || f3 == null || !f3.isDirectory()) {
+        if (imagePath == null || !f3.isDirectory()) {
             imagePath = System.getProperty("user.home") + File.separator;
             setConfig("imagePath", imagePath);
         }
-        if (watermarkPath == null || f4 == null || !f4.isDirectory()) {
+        if (watermarkPath == null || !f4.isDirectory()) {
             watermarkPath = System.getProperty("user.home") + File.separator;
             setConfig("watermarkPath", watermarkPath);
         }
@@ -165,7 +164,7 @@ public class Controller implements Initializable {
             fileOption = "PNG";
             setConfig("fileOption", "PNG");
         }
-        if (waifuPath == null || !Arrays.asList(waifus).contains(waifuPath)) {
+        if (waifuPath == null) {
             waifuPath = "NOT FOUND";
             setConfig("waifuPath", "NOT FOUND");
             waifuField.setText("");
@@ -306,6 +305,10 @@ public class Controller implements Initializable {
             inputImagesBTN.setPrefWidth(100.0);
             inputImagesBTN.setTranslateX(0);
             inputImagesBTN.setTranslateY(0);
+
+            if (stitchSplit.isSelected()) {
+                stitchSplitOptions.setDisable(false);
+            }
         }
 
         // No image has been selected yet
@@ -737,7 +740,7 @@ public class Controller implements Initializable {
         if (greyOption.isSelected()) {
             ImageFilter imageFilter = new GrayFilter(true, 5);
             ImageProducer producer = new FilteredImageSource(watermark.getSource(), imageFilter);
-            watermark = toBufferedImage(Toolkit.getDefaultToolkit().createImage(producer));
+            watermark = (BufferedImage) Toolkit.getDefaultToolkit().createImage(producer);
         }
 
         // Rescales the image
@@ -745,7 +748,7 @@ public class Controller implements Initializable {
         Image tempImage = watermark.getScaledInstance(image.getWidth() / 5,
                 (int)(image.getWidth() / 5 * ratio), Image.SCALE_DEFAULT);
 
-        watermark = toBufferedImage(tempImage);
+        watermark = (BufferedImage) tempImage;
 
         // Asks how many times the watermark will show up
         TextInputDialog input = new TextInputDialog();
@@ -826,9 +829,9 @@ public class Controller implements Initializable {
             splitType = 2;
         }
 
-        int num = askSplitImages();
         // Split horizontally or vertically
         if (splitType == 1 || splitType == 2) {
+            int num = askSplitImages();
             splitHelper(image, num, splitType == 1);
 
             // Finished message
@@ -842,9 +845,18 @@ public class Controller implements Initializable {
 
         // Smart split
         if (splitType == 0) {
-            doSmartSplit(image);
+            smartSplitHelper(image);
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setHeaderText("Stitching and Splitting Complete!");
+            if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+                a.setContentText("Images have been stitched and split and been denoised with level " + (int) denoiseSlider.getValue() + " and scaled by " + (int) Math.pow(2, scaleSlider.getValue()) + "!");
+            } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+                a.setContentText("Images have been stitched and split and denoised with level " + (int) denoiseSlider.getValue());
+            } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
+                a.setContentText("Images have been stitched and split and been scaled by " + scaleSlider.getValue() + "!");
+            }
+            a.showAndWait();
         }
-
     }
 
     // Stitches an ArrayList of images vertically/horizontally
@@ -862,7 +874,7 @@ public class Controller implements Initializable {
         }
 
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setHeaderText(null);
+        a.setHeaderText("Stitching Complete!");
         a.setContentText(files.size() + " images were successfully stitched!");
         a.showAndWait();
     }
@@ -898,62 +910,22 @@ public class Controller implements Initializable {
 
         // Finished message
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setHeaderText(null);
+        a.setHeaderText("Splitting Complete!");
         a.setContentText("Successfully split into " + num + " images!");
         a.showAndWait();
     }
 
     // Splits a BufferedImage by space (row of same colored pixels)
-    public void doSmartSplit(BufferedImage source) throws IOException {
-        int num = askSplitImages();
-
-        // Approximate size of each image
-        int startHeight = source.getHeight() / num;
-        ArrayList<Integer> splitHeights = new ArrayList<>();
-        splitHeights.add(0);
-
-        for (int i = startHeight; i < source.getHeight(); i++ ) {
-            for (int j = 0; j < source.getWidth() - 1; j++) {
-                Color c1 = getColor(source.getRGB(j, i));
-                Color c2 = getColor(source.getRGB(j + 1, i));
-
-                // Checks if the row of pixels is the same color, if not, moves 1 pixel down
-                if (!(c1.getAlpha() == c2.getAlpha() && c1.getRed() == c2.getRed() && c1.getGreen() == c2.getGreen() && c1.getBlue() == c2.getBlue())) {
-                    break;
-                }
-                // Otherwise, it saves the height to split, and moves to the next part
-                if (j+1 == source.getWidth() - 1) {
-                    splitHeights.add(i);
-                    i += startHeight;
-                    break;
-                }
-            }
-        }
-
-        // Adds the remainder of the image to the array
-        if (splitHeights.get(splitHeights.size() - 1) != source.getHeight()) {
-            splitHeights.add(source.getHeight());
-        }
-
-        new File(outputPath + File.separator + "StitchTool" + File.separator).mkdirs();
-
-        // Exports the images into a folder
-        for (int i = 0; i < splitHeights.size() - 1; i++) {
-            File f = new File(outputPath + File.separator + "StitchTool" + File.separator + nameField.getText() + (i+1) + "." + fileOption);
-            ImageIO.write(source.getSubimage(0, splitHeights.get(i), source.getWidth(), splitHeights.get(i+1) - splitHeights.get(i)), fileOption, f);
-            if (waifuHelper(f)) {
-                f.delete();
-            }
-        }
+    public void doSmartSplit(BufferedImage image) throws IOException {
+        int numImages = smartSplitHelper(image);
 
         // Finished message
         Alert a = new Alert(Alert.AlertType.CONFIRMATION);
-        a.setHeaderText(null);
-        int numImages = splitHeights.size() - 1;
+        a.setHeaderText("Smart Split");
         if (numImages == 1) {
             a.setContentText("Unable to smart split!");
         } else {
-            a.setContentText(splitHeights.size() - 1 + " images were successfully created!");
+            a.setContentText(numImages + " images were successfully created!");
         }
         a.showAndWait();
     }
@@ -1105,6 +1077,62 @@ public class Controller implements Initializable {
         }
     }
 
+    // Smart split and waifus as necessary
+    public int smartSplitHelper(BufferedImage image) {
+        int c = 0;
+        int num = askSplitImages();
+
+        // Approximate size of each image
+        int startHeight = image.getHeight() / num;
+        ArrayList<Integer> splitHeights = new ArrayList<>();
+        splitHeights.add(0);
+
+        for (int i = startHeight; i < image.getHeight(); i++ ) {
+            for (int j = 0; j < image.getWidth() - 1; j++) {
+                Color c1 = getColor(image.getRGB(j, i));
+                Color c2 = getColor(image.getRGB(j + 1, i));
+
+                // Checks if the row of pixels is the same color, if not, moves 1 pixel down
+                if (!(c1.getAlpha() == c2.getAlpha() && c1.getRed() == c2.getRed() && c1.getGreen() == c2.getGreen() && c1.getBlue() == c2.getBlue())) {
+                    break;
+                }
+                // Otherwise, it saves the height to split, and moves to the next part
+                if (j+1 == image.getWidth() - 1) {
+                    splitHeights.add(i);
+                    i += startHeight;
+                    c++;
+                    break;
+                }
+            }
+        }
+
+        // Adds the remainder of the image to the array
+        if (splitHeights.get(splitHeights.size() - 1) != image.getHeight()) {
+            splitHeights.add(image.getHeight());
+        }
+
+        outputPath = outputPath + File.separator + "StitchTool" + File.separator;
+        new File(outputPath).mkdirs();
+        outputField.setText(outputPath);
+
+        // Exports the images into a folder
+        try {
+            for (int i = 0; i < splitHeights.size() - 1; i++) {
+                nameField.setText(nameField.getText() + "_" + (i + 1));
+                File f = new File(outputPath + nameField.getText() + "." + fileOption);
+
+                ImageIO.write(image.getSubimage(0, splitHeights.get(i), image.getWidth(), splitHeights.get(i + 1) - splitHeights.get(i)), fileOption, f);
+                if (waifuHelper(f)) {
+                    f.delete();
+                }
+                nameField.setText(nameField.getText().substring(0, nameField.getLength() - 2));
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return c;
+    }
+
     // Waifu2X the image
     public boolean waifuHelper(File f) {
         // If the waifu2x.exe is not found
@@ -1157,7 +1185,7 @@ public class Controller implements Initializable {
         cmd.add("-i");
         cmd.add("\"" + f.getAbsolutePath() + "\"");
         cmd.add("-o");
-        cmd.add("\"" + outputField.getText() + nameField.getText() + "." + fileOption + "\"");
+        cmd.add("\"" + outputField.getText() + nameField.getText() + "_waifu." + fileOption + "\"");
 
         if (waifuPath.contains("CAFFE")) {
             // NOISE AND SCALE
@@ -1224,16 +1252,18 @@ public class Controller implements Initializable {
             a.showAndWait();
         }
 
-        Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setHeaderText(null);
-        if (denoiseBox.isSelected() && scaleBox.isSelected()) {
-            a.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue() + " and scaled by " + (int)Math.pow(2, sf) + "!");
-        } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
-            a.setContentText("Image has been denoised with level " + (int)denoiseSlider.getValue());
-        } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
-            a.setContentText("Image has been scaled by " + sf + "!");
+        if (!stitchSplit.isSelected() && !smartSplit.isSelected()) {
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setHeaderText(null);
+            if (denoiseBox.isSelected() && scaleBox.isSelected()) {
+                a.setContentText("Image has been denoised with level " + (int) denoiseSlider.getValue() + " and scaled by " + (int) Math.pow(2, sf) + "!");
+            } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
+                a.setContentText("Image has been denoised with level " + (int) denoiseSlider.getValue());
+            } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
+                a.setContentText("Image has been scaled by " + sf + "!");
+            }
+            a.showAndWait();
         }
-        a.showAndWait();
         return true;
     }
 
@@ -1280,23 +1310,6 @@ public class Controller implements Initializable {
         }
     }
 
-    // Converts Image to BufferedImage
-    public BufferedImage toBufferedImage(Image img) {
-        if (img instanceof BufferedImage) {
-            return (BufferedImage) img;
-        }
-
-        // Create a buffered image with transparency
-        BufferedImage image = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-
-        // Draw the image on to the buffered image
-        Graphics2D bGr = image.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        return image;
-    }
-
     // Creates a new JFrame that uses the ScrollPanel
     public void previewImage(JFrame f, BufferedImage source, int num) {
         int height = source.getHeight();
@@ -1309,7 +1322,7 @@ public class Controller implements Initializable {
         previewImage.getGraphics().drawImage(tempImage, 0, 0, null);
 
         // Creates a new JFrame window
-        JPanel p = new ScrollPanel(toBufferedImage(previewImage), num);
+        JPanel p = new ScrollPanel(previewImage, num);
         f.setContentPane(p);
         f.setResizable(false);
         f.setSize(700, 700);

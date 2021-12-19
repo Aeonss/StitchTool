@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Properties;
 
 public class Stitch extends Application {
-    private final String version = "3.3.1";
+    private final String version = "3.3.6";
 
     @Override
     public void start(Stage window) throws Exception{
