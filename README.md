@@ -14,26 +14,30 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 </p>
 
 <br>
-<p align="center"><img src="https://i.imgur.com/2i5lcxn.png" width="350" height="450"/></p>
+<p align="center"><img src="https://i.imgur.com/z9Nb5EY.png" width="350" height="450"/></p>
 
 
 <font size="3">
-
-## 🔨 &nbsp; Installation
-* Make sure you have [Java 8 or above](https://jdk.java.net/archive/) installed.
-* Download the jar file from the <a href="https://github.com/Aeonss/StitchTool/releases/latest/">latest release</a> and run it with Java.
-* Any denoising or upscaling requires [Waifu2X Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/) or [Waifu2X Vulkan](https://github.com/nihui/waifu2x-ncnn-vulkan/releases/latest).
 
 ## 🚀 &nbsp; Features
 * Stitch together **any** amount of images either vertically or horizontally.
 * Split an image into **any** amount of images either vertically or horizontally.
 * Preview image before splitting, which is shown by a red line in a separate window.
 * Smart split images by free space, allowing for <b><u>automatic splitting</u></b> without needing to check if the image
-was split through a speech bubble or SFX.
+  was split through a speech bubble or SFX.
 * Add repeatable watermarks to your images.
 * Supports [Waifu2X Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/) and [Waifu2X Vulkan](https://github.com/nihui/waifu2x-ncnn-vulkan/releases/latest) integration.
 * <b><u>Denoise and/or upscale</u></b> images in the program, or while stitching or splitting.
 * Supports .png, .jpg, .jpeg, and .webp!
+
+## 🔨 &nbsp; Installation
+* Make sure you have [Java 8 or above](https://jdk.java.net/archive/) installed.
+* Download the or jar file from the [latest release](https://github.com/Aeonss/StitchTool/releases/latest/) and run it with Java.
+* (Windows Only) Alternatively, download the [exe file](https://github.com/Aeonss/StitchTool/releases/latest/) and run it. If you get a Windows Defender message, click "more info" and then "run".
+* Read through the [code](https://github.com/Aeonss/StitchTool/tree/master/src) or scan with [VirusTotal](https://virustotal.com) if you wish.
+* To import Waifu2X into StitchTool, download one of the forks mentioned above.
+* Select the pink "Import Waifu2X button", and select the executable Waifu2X file.
+* Make sure to select the CUI.exe if you're using [Waifu2X Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/).
 
 ## 📝 &nbsp; How To Use
 

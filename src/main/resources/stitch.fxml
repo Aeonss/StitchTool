@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="900.0" prefWidth="700.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+   <children>
+      <GridPane fx:id="mainPane" prefHeight="800.0" prefWidth="700.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="550.0" minWidth="550.0" prefWidth="550.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="75.0" minWidth="75.0" prefWidth="75.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints maxHeight="120.0" minHeight="120.0" prefHeight="120.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" valignment="TOP" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="50.0" minHeight="50.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="200.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="120.0" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="70.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="120.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <children>
+                  <Text fx:id="title" strokeType="OUTSIDE" strokeWidth="10.0" text="Stitch ❤" textAlignment="CENTER" wrappingWidth="550.0">
+                     <font>
+                        <Font name="Century Gothic" size="54.0" />
+                     </font>
+                     <FlowPane.margin>
+                        <Insets top="25.0" />
+                     </FlowPane.margin>
+                     <fill>
+                        <LinearGradient endX="1.0" endY="1.0">
+                           <stops>
+                              <Stop color="WHITE" />
+                              <Stop color="WHITE" offset="1.0" />
+                           </stops>
+                        </LinearGradient>
+                     </fill>
+                  </Text>
+               </children>
+            </FlowPane>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <children>
+                  <TextField fx:id="inputField" depthTest="DISABLE" editable="false" mouseTransparent="true" pickOnBounds="false" prefHeight="30.0" prefWidth="310.0" promptText="Input Path">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" right="20.0" />
+                     </FlowPane.margin>
+                     <cursor>
+                        <Cursor fx:constant="DEFAULT" />
+                     </cursor>
+                  </TextField>
+                  <Button fx:id="inputFolderBTN" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onImportFolder" prefHeight="30.0" prefWidth="100.0" stylesheets="@style.css" text="Import Folder">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" right="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button fx:id="inputImagesBTN" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onImportImages" prefHeight="30.0" prefWidth="100.0" text="Import Images">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+               </children>
+            </FlowPane>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+               <children>
+                  <TextField fx:id="outputField" depthTest="DISABLE" editable="false" maxHeight="30.0" maxWidth="380.0" minHeight="30.0" minWidth="380.0" mouseTransparent="true" pickOnBounds="false" prefHeight="30.0" prefWidth="380.0" promptText="Output Path">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" right="20.0" />
+                     </FlowPane.margin>
+                  </TextField>
+                  <Button fx:id="outputBTN" mnemonicParsing="false" onMouseClicked="#onOutput" prefHeight="30.0" prefWidth="150.0" text="Browse Output Location">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+               </children>
+            </FlowPane>
+            <Separator halignment="RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="500.0" GridPane.columnIndex="1" GridPane.rowIndex="7">
+               <GridPane.margin>
+                  <Insets left="50.0" />
+               </GridPane.margin>
+            </Separator>
+            <Button fx:id="dropBTN1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onDrop" prefHeight="30.0" prefWidth="50.0" text="🠋" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <FlowPane fx:id="actionPane" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="10">
+               <children>
+                  <RadioButton fx:id="stitchSplit" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#updateGUI" prefHeight="30.0" prefWidth="110.0" selected="true" text="Stitch / Split" textAlignment="CENTER" textFill="WHITE">
+                     <FlowPane.margin>
+                        <Insets left="50.0" top="20.0" />
+                     </FlowPane.margin>
+                     <toggleGroup>
+                        <ToggleGroup fx:id="action" />
+                     </toggleGroup>
+                  </RadioButton>
+                  <RadioButton fx:id="stitch" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#updateGUI" prefHeight="30.0" prefWidth="80.0" text="Stitch" textAlignment="CENTER" textFill="WHITE" toggleGroup="$action">
+                     <FlowPane.margin>
+                        <Insets left="25.0" right="25.0" top="20.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="split" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#updateGUI" prefHeight="30.0" prefWidth="75.0" text="Split" textAlignment="CENTER" textFill="WHITE" toggleGroup="$action">
+                     <FlowPane.margin>
+                        <Insets right="25.0" top="20.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="smartSplit" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#updateGUI" prefHeight="30.0" prefWidth="110.0" text="Smart Split" textAlignment="CENTER" textFill="WHITE" toggleGroup="$action">
+                     <FlowPane.margin>
+                        <Insets top="20.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+                  <ChoiceBox fx:id="stitchSplitOptions" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="245.0">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" left="50.0" right="10.0" top="30.0" />
+                     </FlowPane.margin>
+                  </ChoiceBox>
+                  <RadioButton fx:id="vertical" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#updateGUI" prefHeight="30.0" prefWidth="85.0" selected="true" text="Vertical" textAlignment="CENTER" textFill="WHITE">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="action1" />
+                     </toggleGroup>
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" right="10.0" top="30.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+                  <RadioButton fx:id="horizontal" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#updateGUI" prefHeight="30.0" prefWidth="100.0" text="Horizontal" textAlignment="CENTER" textFill="WHITE" toggleGroup="$action1">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" top="30.0" />
+                     </FlowPane.margin>
+                  </RadioButton>
+               </children>
+            </FlowPane>
+            <FlowPane fx:id="waifuPane" prefHeight="190.0" prefWidth="489.0" GridPane.columnIndex="1" GridPane.rowIndex="8">
+               <children>
+                  <TextField fx:id="waifuField" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="290.0" promptText="Waifu2X Caffe Location (CUI)">
+                     <FlowPane.margin>
+                        <Insets right="20.0" top="20.0" />
+                     </FlowPane.margin></TextField>
+                  <Button fx:id="waifuBTN" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onWaifu" prefHeight="30.0" prefWidth="120.0" stylesheets="@style.css" text="Import Waifu2X">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <FlowPane.margin>
+                        <Insets right="20.0" top="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <Button fx:id="runWaifuBTN" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onRunWaifu" prefHeight="30.0" prefWidth="100.0" stylesheets="@style.css" text="Run Waifu2X">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <FlowPane.margin>
+                        <Insets top="20.0" />
+                     </FlowPane.margin>
+                  </Button>
+                  <CheckBox fx:id="denoiseBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onDenoise" prefHeight="30.0" prefWidth="120.0" selected="true" text="Denoise Level" textFill="WHITE">
+                     <FlowPane.margin>
+                        <Insets right="5.0" top="30.0" />
+                     </FlowPane.margin>
+                  </CheckBox>
+                  <Slider fx:id="denoiseSlider" blockIncrement="0.0" majorTickUnit="1.0" max="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="0" prefHeight="10.0" prefWidth="110.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0">
+                     <FlowPane.margin>
+                        <Insets right="43.0" top="40.0" />
+                     </FlowPane.margin>
+                  </Slider>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Waifu2X Model">
+                     <FlowPane.margin>
+                        <Insets right="5.0" top="30.0" />
+                     </FlowPane.margin>
+                  </Text>
+                  <ChoiceBox fx:id="modelOptions" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="185.0">
+                     <FlowPane.margin>
+                        <Insets top="30.0" />
+                     </FlowPane.margin>
+                  </ChoiceBox>
+                  <CheckBox fx:id="scaleBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onScale" prefHeight="30.0" prefWidth="80.0" text="Scale" textFill="WHITE">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" right="5.0" top="30.0" />
+                     </FlowPane.margin>
+                  </CheckBox>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Scale">
+                     <FlowPane.margin>
+                        <Insets right="5.0" top="10.0" />
+                     </FlowPane.margin>
+                  </Text>
+                  <Slider fx:id="scaleSlider" blockIncrement="1.0" majorTickUnit="1.0" max="6.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="0" prefHeight="10.0" prefWidth="122.0" showTickLabels="true" showTickMarks="true" snapToTicks="true">
+                     <FlowPane.margin>
+                        <Insets right="10.0" top="30.0" />
+                     </FlowPane.margin>
+                  </Slider>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Height">
+                     <FlowPane.margin>
+                        <Insets right="5.0" top="10.0" />
+                     </FlowPane.margin>
+                  </Text>
+                  <TextField fx:id="scaleHeightField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="110.0" promptText="Scale Height">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" right="5.0" top="30.0" />
+                     </FlowPane.margin>
+                  </TextField>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Width">
+                     <FlowPane.margin>
+                        <Insets right="5.0" top="10.0" />
+                     </FlowPane.margin>
+                  </Text>
+                  <TextField fx:id="scaleWidthField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="105.0" promptText="Scale Width">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" top="30.0" />
+                     </FlowPane.margin>
+                  </TextField>
+               </children>
+            </FlowPane>
+            <FlowPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+               <children>
+                  <TextField fx:id="nameField" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="430.0" promptText="File Name">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" right="20.0" />
+                     </FlowPane.margin>
+                  </TextField>
+                  <ChoiceBox fx:id="fileOptions" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="100.0">
+                     <FlowPane.margin>
+                        <Insets bottom="20.0" />
+                     </FlowPane.margin>
+                  </ChoiceBox>
+               </children>
+            </FlowPane>
+            <Separator maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="500.0" GridPane.columnIndex="1" GridPane.rowIndex="9">
+               <GridPane.margin>
+                  <Insets left="50.0" />
+               </GridPane.margin>
+            </Separator>
+            <Button fx:id="dropBTN2" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onDrop" prefHeight="30.0" prefWidth="50.0" text="🠋" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+            <Separator maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="500.0" GridPane.columnIndex="1" GridPane.rowIndex="11">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <GridPane.margin>
+                  <Insets left="50.0" />
+               </GridPane.margin></Separator>
+            <FlowPane fx:id="watermarkPane" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="12">
+               <children>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Opacity %">
+                     <FlowPane.margin>
+                        <Insets />
+                     </FlowPane.margin>
+                  </Text>
+                  <Slider fx:id="opacitySlider" blockIncrement="0.0" majorTickUnit="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" minorTickCount="0" prefHeight="30.0" prefWidth="256.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="40.0">
+                     <FlowPane.margin>
+                        <Insets right="20.0" top="20.0" />
+                     </FlowPane.margin>
+                  </Slider>
+                  <CheckBox fx:id="greyOption" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Greyscale" textFill="WHITE">
+                     <FlowPane.margin>
+                        <Insets right="20.0" />
+                     </FlowPane.margin></CheckBox>
+                  <Button fx:id="watermarkBTN" maxHeight="30.0" maxWidth="100.0" minHeight="30.0" minWidth="100.0" mnemonicParsing="false" onMouseClicked="#onWatermark" prefHeight="30.0" prefWidth="100.0" text="Watermark">
+                     <FlowPane.margin>
+                        <Insets />
+                     </FlowPane.margin>
+                  </Button>
+               </children>
+            </FlowPane>
+            <Separator GridPane.columnIndex="1" GridPane.rowIndex="13" />
+            <Button fx:id="runBTN" mnemonicParsing="false" onMouseClicked="#onRun" prefWidth="70.0" text="Run" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="14">
+               <padding>
+                  <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+               </padding>
+               <GridPane.margin>
+                  <Insets left="240.0" />
+               </GridPane.margin>
+            </Button>
+            <Button fx:id="dropBTN3" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#onDrop" prefHeight="30.0" prefWidth="50.0" text="🠋" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+         </children>
+      </GridPane>
+   </children>
+</VBox>
