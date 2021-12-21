@@ -14,7 +14,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 </p>
 
 <br>
-<p align="center"><img src="https://i.imgur.com/2i5lcxn.png" width="500" height="662"/></p>
+<p align="center"><img src="https://i.imgur.com/z9Nb5EY.png" width="500" height="662"/></p>
 
 
 <font size="3">
