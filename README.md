@@ -14,7 +14,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 </p>
 
 <br>
-<p align="center"><img src="https://i.imgur.com/z9Nb5EY.png" width="350" height="450"/></p>
+<p align="center"><img src="https://i.imgur.com/2i5lcxn.png" width="500" height="662"/></p>
 
 
 <font size="3">
@@ -32,7 +32,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 
 ## 🔨 &nbsp; Installation
 * Make sure you have [Java 8 or above](https://jdk.java.net/archive/) installed.
-* Download the or jar file from the [latest release](https://github.com/Aeonss/StitchTool/releases/latest/) and run it with Java.
+* Download the jar file from the [latest release](https://github.com/Aeonss/StitchTool/releases/latest/) and run it with Java.
 * (Windows Only) Alternatively, download the [exe file](https://github.com/Aeonss/StitchTool/releases/latest/) and run it. If you get a Windows Defender message, click "more info" and then "run".
 * Read through the [code](https://github.com/Aeonss/StitchTool/tree/master/src) or scan with [VirusTotal](https://virustotal.com) if you wish.
 * To import Waifu2X into StitchTool, download one of the forks mentioned above.
