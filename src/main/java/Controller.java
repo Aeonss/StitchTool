@@ -38,6 +38,7 @@ public class Controller implements Initializable {
     @FXML private Button inputImagesBTN;
     @FXML private TextField outputField;
     @FXML private TextField nameField;
+    @FXML private CheckBox batchBox;
     @FXML private ChoiceBox<String> fileOptions;
 
     @FXML private GridPane mainPane;
@@ -113,6 +114,9 @@ public class Controller implements Initializable {
     // Called after constructor
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        // Temp
+        batchBox.setDisable(true);
 
         // Final values
         final String[] files = new String[]{"PNG", "JPG"};
@@ -1113,7 +1117,7 @@ public class Controller implements Initializable {
     // Waifu2X the image
     public boolean waifuHelper(File f) {
         // If the waifu2x.exe is not found
-        if (waifuPath.equalsIgnoreCase("NOT FOUND")) {
+        if (waifuPath.equalsIgnoreCase("NOT FOUND") || (!denoiseBox.isSelected() && !scaleBox.isSelected())) {
             return false;
         }
 

@@ -13,18 +13,18 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="webp-imageio-core-0.1.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.nintha:webp-imageio-core:0.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:mac:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:linux:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:mac:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:linux:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:win:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:mac:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:linux:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:win:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:mac:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:linux:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:mac:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:linux:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:win:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-controls:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:mac:17.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-fxml:linux:17.0.1" level="project" />
   </component>
 </module>

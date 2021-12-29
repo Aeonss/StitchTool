@@ -77,7 +77,7 @@
     -fx-font-weight: 200;
 }
 
-#nameField, #fileOptions {
+#nameField, #batchBox, #fileOptions {
     -fx-border-color: #e74c3c;
 }
 
