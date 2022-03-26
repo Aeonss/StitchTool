@@ -1074,7 +1074,10 @@ public class Controller implements Initializable {
                 Color c2 = Util.getColor(image.getRGB(j + 1, i));
 
                 // Checks if the row of pixels is the same color, if not, moves 1 pixel down
-                if (!(c1.getAlpha() == c2.getAlpha() && c1.getRed() == c2.getRed() && c1.getGreen() == c2.getGreen() && c1.getBlue() == c2.getBlue())) {
+                if (!(c2.getAlpha()-10 <= c1.getAlpha() && c1.getAlpha() <= c2.getAlpha()+10 &&
+                        c2.getRed()-10 <= c1.getRed() && c1.getRed() <= c2.getRed()+10 &&
+                        c2.getGreen()-10 <= c1.getGreen() && c1.getGreen() <= c2.getGreen()+10 &&
+                        c2.getBlue()-10 <= c1.getBlue() && c1.getBlue() <= c2.getBlue()+10)) {
                     break;
                 }
                 // Otherwise, it saves the height to split, and moves to the next part
@@ -1116,12 +1119,13 @@ public class Controller implements Initializable {
 
     // Waifu2X the image
     public boolean waifuHelper(File f) {
+
         // If the waifu2x.exe is not found
         if (waifuPath.equalsIgnoreCase("NOT FOUND") || (!denoiseBox.isSelected() && !scaleBox.isSelected())) {
             return false;
         }
 
-        int sf = (int) scaleSlider.getValue();
+        int sf = (int) Math.pow(2, scaleSlider.getValue());
         String shf = scaleHeightField.getText();
         String swf = scaleWidthField.getText();
 
@@ -1168,7 +1172,7 @@ public class Controller implements Initializable {
         cmd.add("-o");
         cmd.add("\"" + outputField.getText() + nameField.getText() + "_waifu." + fileOption + "\"");
 
-        if (waifuPath.contains("CAFFE")) {
+        if (waifuPath.contains("caffe")) {
             // NOISE AND SCALE
             cmd.add("-m");
             if (denoiseBox.isSelected() && scaleBox.isSelected()) {
@@ -1206,7 +1210,7 @@ public class Controller implements Initializable {
             cmd.add("--model_dir");
             cmd.add(new File(waifuField.getText()).getParent() + File.separator + "models" + File.separator + modelOptions.getValue());
         }
-        else if (waifuPath.contains("VULKAN")) {
+        else if (waifuPath.contains("vulkan")) {
             if (denoiseBox.isSelected()) {
                 cmd.add("-n");
                 cmd.add(((int) denoiseSlider.getValue()) + "");
@@ -1237,7 +1241,7 @@ public class Controller implements Initializable {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
             a.setHeaderText(null);
             if (denoiseBox.isSelected() && scaleBox.isSelected()) {
-                a.setContentText("Image has been denoised with level " + (int) denoiseSlider.getValue() + " and scaled by " + (int) Math.pow(2, sf) + "!");
+                a.setContentText("Image has been denoised with level " + (int) denoiseSlider.getValue() + " and scaled by " + sf + "!");
             } else if (denoiseBox.isSelected() && !scaleBox.isSelected()) {
                 a.setContentText("Image has been denoised with level " + (int) denoiseSlider.getValue());
             } else if (!denoiseBox.isSelected() && scaleBox.isSelected()) {
@@ -1245,6 +1249,13 @@ public class Controller implements Initializable {
             }
             a.showAndWait();
         }
+
+        for (int i = 1; i < cmd.size(); i++) {
+            System.out.print(cmd + " ");
+        }
+        System.out.println("END");
+
+
         return true;
     }
 }
