@@ -107,6 +107,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 <li> Select the image you want the watermark to be on. </li>
 <li> Select the watermark image. </li>
 <li> Input the number of times you want the watermark to appear. </li>
+<li> Input the watermark width percentage compared to the main image. </li>
 </ol>
 
 ## ✅ &nbsp; Additional Information
