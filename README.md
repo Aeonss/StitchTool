@@ -36,8 +36,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 * (Windows Only) Alternatively, download the [exe file](https://github.com/Aeonss/StitchTool/releases/latest/) and run it. If you get a Windows Defender message, click "more info" and then "run".
 * Read through the [code](https://github.com/Aeonss/StitchTool/tree/master/src) or scan with [VirusTotal](https://virustotal.com) if you wish.
 * To import Waifu2X into StitchTool, download one of the forks mentioned above.
-* Select the pink "Import Waifu2X button", and select the executable Waifu2X file.
-* Make sure to select the CUI.exe if you're using [Waifu2X Caffe](https://github.com/lltcggie/waifu2x-caffe/releases/latest/).
+* Select the pink "Import Waifu2X button", and select [<b><u>waifu2x-caffe-cui.exe</u></b>](https://github.com/lltcggie/waifu2x-caffe/releases/latest/) or [<b><u>waifu2x-ncnn-vulkan.exe</u></b>](https://github.com/nihui/waifu2x-ncnn-vulkan/releases/latest).
 
 ## 📝 &nbsp; How To Use
 
@@ -48,7 +47,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 <li> Select the input images you want to stitch and split with the green button. You can choose an entire folder of images, or you can choose specific images. </li>
 <li> Select output location. If not selected, it defaults to the user's folder. </li>
 <li> Input the image name in the red textbox. If not inputted, it generates a random 10 character name. </li>
-<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
+<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan.exe</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
 <li> Click the run button at the bottom. </li>
 <li> Choose the amount of images to be split into. </li>
 </ol>
@@ -60,7 +59,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 <li> Select the input images you want to stitch with the green button. You can choose an entire folder of images, or you can choose specific images. </li>
 <li> Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder. </li>
 <li> Input the image name in the red textbox. If not inputted, it generates a random 10 character name. </li>
-<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
+<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan.exe</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
 <li> Click the run button at the bottom. </li>
 </ol>
 
@@ -71,7 +70,7 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 <li> Select the folder of images you want to split with the green button. </li>
 <li> Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder. </li>
 <li> Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-". </li>
-<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
+<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan.exe</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
 <li> Click the run button at the bottom. </li>
 <li> Choose the amount of images to be split into. </li>
 <li> Review the preview and continue or reenter the number of images you want the image to be split into. </li>
@@ -84,14 +83,14 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 <li> Select the folder of images you want to split. </li>
 <li> Select output location with the green "Browse Output Location" button. If not selected, it defaults to the user's folder. </li>
 <li> Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-". </li>
-<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
+<li> (Optional) Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan.exe</u></b> by clicking the pink "Import Waifu2X" button to denoise and/or scale during the process. </li>
 <li> Click the run button at the bottom. </li>
 </ol>
 
 <h3>Denoising and/or Upscaling</h3>
 <ol>
 <li> Input the image name in the red textbox. If not inputted, it defaults to "StitchTool-". </li>
-<li> Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan</u></b> by clicking the pink "Import Waifu2X" button. </li>
+<li> Import the location of <b><u>waifu2x-caffe-cui.exe</u></b> or <b><u>waifu2x-ncnn-vulkan.exe</u></b> by clicking the pink "Import Waifu2X" button. </li>
 <li> Select the denoising level and/or scale ratio OR scale height/width. </li>
 <li> Waifu2x prioritizes scale height/width if the ratio and dimensions are given. </li>
 <li> Click the pink "Run Waifu2X" button. </li>
@@ -114,12 +113,21 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 * StitchTool was compiled with **Java 17** and **JavaFX 17**.
 * StitchTool will stitch together images that are named in *alphanumerical order*.
 * Collapse sections with the arrow button next to the line separator.
-* Waifu2X Caffe prioritizes **scale height and width over scale ratio**, and outputs only in PNG for the best quality.
+* Waifu2X prioritizes **scale height and width over scale ratio**, and outputs only in PNG for the best quality.
 * Please request any features or report any bugs in [issues](https://github.com/Aeonss/StitchTool/issues).
 
 ## ❤️&nbsp; Contributions
 * Thank you to ZeroCool940711 for helping debugging and testing StitchTool
 * Thank you to thenuke740 and mjsaltus for UI suggestions
+
+## 🤖 &nbsp; To Do
+* Squash all the bugs!
+* Add a recursive feature for stitch/split (Folders within folders)
+* Add config for remembering denoise level and scale
+* Fix any waifu bugs
+* Add config for remembering collapsed sections
+* Resize fields with windows
+* Fix weird bug with checkbox field misaligning
 
 ## 📘 &nbsp; License
 StitchTool is released under the [MIT license](https://github.com/Aeonss/StitchTool/blob/master/LICENSE.md).
