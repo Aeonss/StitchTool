@@ -32,8 +32,8 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 
 ## 🔨 &nbsp; Installation
 * Make sure you have [Java 8 or above](https://jdk.java.net/archive/) installed.
-* Download the jar file from the [latest release](https://github.com/Aeonss/StitchTool/releases/latest/) and run it with Java.
-* (Windows Only) Alternatively, download the [exe file](https://github.com/Aeonss/StitchTool/releases/latest/) and run it. If you get a Windows Defender message, click "more info" and then "run".
+* Download the installer for your platform from the [latest release on Jdeploy](https://www.jdeploy.com/~stitchtool).
+* (<b>Windows Only</b>) Alternatively, download the [jar file](https://github.com/Aeonss/StitchTool/releases/latest/) and run it with Java.
 * Read through the [code](https://github.com/Aeonss/StitchTool/tree/master/src) or scan with [VirusTotal](https://virustotal.com) if you wish.
 * To import Waifu2X into StitchTool, download one of the forks mentioned above.
 * Select the pink "Import Waifu2X button", and select [<b><u>waifu2x-caffe-cui.exe</u></b>](https://github.com/lltcggie/waifu2x-caffe/releases/latest/) or [<b><u>waifu2x-ncnn-vulkan.exe</u></b>](https://github.com/nihui/waifu2x-ncnn-vulkan/releases/latest).
