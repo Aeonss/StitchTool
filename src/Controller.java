@@ -750,15 +750,8 @@ public class Controller implements Initializable {
         if (greyOption.isSelected()) {
             ImageFilter imageFilter = new GrayFilter(true, 5);
             ImageProducer producer = new FilteredImageSource(watermark.getSource(), imageFilter);
-            watermark = (BufferedImage) Toolkit.getDefaultToolkit().createImage(producer);
+            watermark = Util.toBufferedImage(Toolkit.getDefaultToolkit().createImage(producer));
         }
-
-        // Rescales the image
-        double ratio = (double) watermark.getWidth() / watermark.getHeight();
-        Image tempImage = watermark.getScaledInstance(image.getWidth() / 5,
-                (int)(image.getWidth() / 5 * ratio), Image.SCALE_DEFAULT);
-
-        watermark = (BufferedImage) tempImage;
 
         // Asks how many times the watermark will show up
         TextInputDialog input = new TextInputDialog();
@@ -777,7 +770,7 @@ public class Controller implements Initializable {
             } catch (NumberFormatException nfe) {
                 Alert a = new Alert(Alert.AlertType.ERROR);
                 a.setHeaderText(null);
-                a.setContentText("Please input a number only!");
+                a.setContentText("Please input a number that is more than 0!");
                 a.showAndWait();
                 input.showAndWait();
                 if (input.getResult() == null) {
@@ -785,6 +778,39 @@ public class Controller implements Initializable {
                 }
             }
         }
+
+        // Asks how % of width the watermark
+        TextInputDialog inputSize = new TextInputDialog();
+        inputSize.setHeaderText(null);
+        inputSize.setContentText("What % of width would you like the watermark to be?");
+        inputSize.showAndWait();
+        if (inputSize.getResult() == null) {
+            return;
+        }
+
+        // Makes sure the input is a number
+        int width = 0;
+        while (width <= 0 || width > 100) {
+            try {
+                width = Integer.parseInt(inputSize.getResult());
+            } catch (NumberFormatException nfe) {
+                Alert a = new Alert(Alert.AlertType.ERROR);
+                a.setHeaderText(null);
+                a.setContentText("Please input a percentage between 1 and 100!");
+                a.showAndWait();
+                input.showAndWait();
+                if (input.getResult() == null) {
+                    return;
+                }
+            }
+        }
+
+        // Rescales the image
+        double ratio = (double) watermark.getWidth() / watermark.getHeight();
+        Image tempImage = watermark.getScaledInstance(image.getWidth() * width/100,
+                (int)(image.getWidth() * width/100 * ratio), Image.SCALE_DEFAULT);
+
+        watermark = Util.toBufferedImage(tempImage);
 
         // Loop to draw the watermark
         Graphics2D g = image.createGraphics();
@@ -798,7 +824,7 @@ public class Controller implements Initializable {
 
         // Checks if the image has a name
         if (nameField.getText().isEmpty()) {
-            nameField.setText(imageFile.getName() + "_watermarked");
+            nameField.setText(imageFile.getName().replaceFirst("[.][^.]+$", "") + "_watermarked");
         }
 
         // Exports the image
