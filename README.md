@@ -124,8 +124,6 @@ splitter</u></strong> and an <strong><u>integrated denoiser and upscaler</u></st
 ## 🤖 &nbsp; To Do
 * Squash all the bugs!
 * Add a recursive feature for stitch/split (Folders within folders)
-* Add config for remembering denoise level and scale
-* Fix any waifu bugs
 * Add config for remembering collapsed sections
 * Resize fields with windows
 * Fix weird bug with checkbox field misaligning

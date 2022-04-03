@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Properties;
 
 public class Stitch extends Application {
-    private final String version = "4.0.2";
+    private final String version = "4.0.6";
 
     public static void main(String[] args) {
         launch(args);

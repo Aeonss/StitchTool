@@ -77,6 +77,8 @@ public class Controller implements Initializable {
     private String actionOption;
     private String ssOption;
     private String fileOption;
+    private String lastDenoise;
+    private String lastScale;
 
     private ObservableList<String> modelList;
     private String[] caffeModels;
@@ -108,6 +110,9 @@ public class Controller implements Initializable {
         actionOption = Util.getConfig("actionOption");
         ssOption = Util.getConfig("ssOption");
         fileOption = Util.getConfig("fileOption");
+        lastDenoise = Util.getConfig("lastDenoise");
+        lastScale = Util.getConfig("lastScale");
+
         files = new ArrayList<>();
     }
 
@@ -172,6 +177,14 @@ public class Controller implements Initializable {
             waifuPath = "NOT FOUND";
             Util.setConfig("waifuPath", "NOT FOUND");
             waifuField.setText("");
+        }
+        if (lastDenoise == null) {
+            lastDenoise = "no";
+            Util.setConfig("lastDenoise", "no");
+        }
+        if (lastScale == null) {
+            lastScale = "no";
+            Util.setConfig("lastScale", "no");
         }
 
         // Default setups
@@ -271,6 +284,18 @@ public class Controller implements Initializable {
             fileOptions.setValue("PNG");
         } else {
             fileOptions.setValue("JPG");
+        }
+
+        if (lastDenoise.equalsIgnoreCase("no")) {
+            denoiseBox.setSelected(false);
+        } else {
+            denoiseBox.setSelected(true);
+        }
+
+        if (lastScale.equalsIgnoreCase("no")) {
+            scaleBox.setSelected(false);
+        } else {
+            scaleBox.setSelected(true);
         }
 
         // Updates GUI
@@ -535,8 +560,10 @@ public class Controller implements Initializable {
         if (denoiseBox.isSelected()) {
             denoiseSlider.setDisable(false);
             modelOptions.setDisable(false);
+            Util.setConfig("lastDenoise", "yes");
         } else {
             denoiseSlider.setDisable(true);
+            Util.setConfig("lastDenoise", "no");
         }
         if (!denoiseBox.isSelected() && !scaleBox.isSelected()) {
             modelOptions.setDisable(true);
@@ -550,6 +577,7 @@ public class Controller implements Initializable {
             scaleHeightField.setDisable(false);
             scaleWidthField.setDisable(false);
             modelOptions.setDisable(false);
+            Util.setConfig("lastScale", "yes");
 
             // Width and height are only enabled for caffe
             if (waifuPath.contains("vulkan")) {
@@ -563,6 +591,7 @@ public class Controller implements Initializable {
             scaleSlider.setDisable(true);
             scaleHeightField.setDisable(true);
             scaleWidthField.setDisable(true);
+            Util.setConfig("lastScale", "no");
         }
         if (!denoiseBox.isSelected() && !scaleBox.isSelected()) {
             modelOptions.setDisable(true);
@@ -1128,14 +1157,12 @@ public class Controller implements Initializable {
         // Exports the images into a folder
         try {
             for (int i = 0; i < splitHeights.size() - 1; i++) {
-                nameField.setText(nameField.getText() + "_" + (i + 1));
-                File f = new File(outputPath + nameField.getText() + "." + fileOption);
+                File f = new File(outputPath + nameField.getText() + "_" + (i + 1) + "." + fileOption);
 
                 ImageIO.write(image.getSubimage(0, splitHeights.get(i), image.getWidth(), splitHeights.get(i + 1) - splitHeights.get(i)), fileOption, f);
                 if (waifuHelper(f)) {
                     f.delete();
                 }
-                nameField.setText(nameField.getText().substring(0, nameField.getLength() - 2));
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -1145,6 +1172,8 @@ public class Controller implements Initializable {
 
     // Waifu2X the image
     public boolean waifuHelper(File f) {
+
+        boolean waifuAlone = false;
 
         // If the waifu2x.exe is not found
         if (waifuPath.equalsIgnoreCase("NOT FOUND") || (!denoiseBox.isSelected() && !scaleBox.isSelected())) {
@@ -1171,6 +1200,7 @@ public class Controller implements Initializable {
 
         // If f is null, ask user to select image
         if (f == null) {
+            waifuAlone = true;
             // Ask user to select image
             FileChooser input = new FileChooser();
             input.setTitle("Select image to Waifu2X");
@@ -1245,7 +1275,7 @@ public class Controller implements Initializable {
             }
             if (scaleBox.isSelected()) {
                 cmd.add("-s");
-                cmd.add(Math.pow(2, sf) + "");
+                cmd.add(sf + "");
             }
             cmd.add("-m");
             cmd.add(new File(waifuField.getText()).getParent() + File.separator + modelOptions.getValue());
@@ -1263,7 +1293,7 @@ public class Controller implements Initializable {
             a.showAndWait();
         }
 
-        if (!stitchSplit.isSelected() && !smartSplit.isSelected()) {
+        if (waifuAlone) {
             Alert a = new Alert(Alert.AlertType.INFORMATION);
             a.setHeaderText(null);
             if (denoiseBox.isSelected() && scaleBox.isSelected()) {
@@ -1276,11 +1306,7 @@ public class Controller implements Initializable {
             a.showAndWait();
         }
 
-        for (int i = 1; i < cmd.size(); i++) {
-            System.out.print(cmd + " ");
-        }
-        System.out.println("END");
-
+        System.out.print(cmd + "\n");
 
         return true;
     }
