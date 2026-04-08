@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#191919">
+  <title>Stitch Tool</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <h1 class="app-title">Stitch <span class="heart">❤</span></h1>
+    <p class="app-sub">by Aeon</p>
+  </header>
+
+  <main class="app-main">
+
+    <!-- ── Mode Tabs ── -->
+    <div class="tabs-wrap">
+      <div class="tabs" role="tablist" aria-label="Mode">
+        <button class="tab active" role="tab" data-mode="stitch">Stitch</button>
+        <button class="tab" role="tab" data-mode="split">Split</button>
+        <button class="tab" role="tab" data-mode="smartsplit">Smart Split</button>
+        <button class="tab" role="tab" data-mode="stitchsplit">Stitch+Split</button>
+        <button class="tab" role="tab" data-mode="watermark">Watermark</button>
+      </div>
+    </div>
+
+    <div class="card">
+
+      <!-- ── Import ── -->
+      <section class="section">
+        <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Import images">
+          <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 16 12 12 8 16"></polyline>
+            <line x1="12" y1="12" x2="12" y2="21"></line>
+            <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"></path>
+          </svg>
+          <p class="drop-primary" id="drop-label">Tap to import images</p>
+          <p class="drop-secondary">or drag &amp; drop here</p>
+          <input type="file" id="file-input" accept="image/*" multiple>
+        </div>
+
+        <!-- Watermark image import (watermark mode only) -->
+        <div class="wm-import hidden" id="wm-import-row">
+          <button class="btn btn-outline" id="wm-img-btn">Import Watermark Image</button>
+          <span class="file-badge" id="wm-img-label">No file selected</span>
+          <input type="file" id="wm-img-input" accept="image/*" class="hidden">
+        </div>
+
+        <!-- Selected file list -->
+        <ul class="file-list" id="file-list" aria-label="Selected files"></ul>
+      </section>
+
+      <hr class="divider">
+
+      <!-- ── Settings ── -->
+      <section class="section settings">
+
+        <!-- Direction toggle (stitch / split modes) -->
+        <div class="setting-row" id="row-direction">
+          <span class="setting-label">Direction</span>
+          <div class="toggle-group" role="group" aria-label="Direction">
+            <button class="toggle active" id="btn-vertical"   data-dir="vertical">Vertical</button>
+            <button class="toggle"        id="btn-horizontal" data-dir="horizontal">Horizontal</button>
+          </div>
+        </div>
+
+        <!-- Stitch+Split combo -->
+        <div class="setting-row hidden" id="row-ss-combo">
+          <label class="setting-label" for="ss-combo">Operation</label>
+          <select class="select" id="ss-combo">
+            <option value="v-smart">Stitch Vertical → Smart Split</option>
+            <option value="v-h">Stitch Vertical → Split Horizontal</option>
+            <option value="v-v">Stitch Vertical → Split Vertical</option>
+            <option value="h-smart">Stitch Horizontal → Smart Split</option>
+            <option value="h-h">Stitch Horizontal → Split Horizontal</option>
+            <option value="h-v">Stitch Horizontal → Split Vertical</option>
+          </select>
+        </div>
+
+        <!-- Number of parts (split / smart split / stitch+split) -->
+        <div class="setting-row hidden" id="row-parts">
+          <label class="setting-label" for="parts-input">Parts</label>
+          <input class="input input-sm" type="number" id="parts-input" value="2" min="2" max="999" inputmode="numeric">
+        </div>
+
+        <!-- Watermark options -->
+        <div class="hidden" id="wm-opts">
+          <div class="setting-row">
+            <label class="setting-label" for="opacity-range">
+              Opacity&nbsp;<strong id="opacity-val">40</strong>%
+            </label>
+            <input type="range" id="opacity-range" min="0" max="100" value="40" class="range">
+          </div>
+          <div class="setting-row">
+            <label class="setting-label check-wrap">
+              <input type="checkbox" id="greyscale-chk" class="check">
+              <span>Greyscale</span>
+            </label>
+          </div>
+          <div class="setting-row two-col">
+            <div>
+              <label class="setting-label" for="wm-count">Count</label>
+              <input class="input input-sm" type="number" id="wm-count" value="3" min="1" inputmode="numeric">
+            </div>
+            <div>
+              <label class="setting-label" for="wm-width-pct">Width %</label>
+              <input class="input input-sm" type="number" id="wm-width-pct" value="20" min="1" max="100" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+
+        <!-- File name & format -->
+        <div class="setting-row">
+          <label class="setting-label" for="filename">Name</label>
+          <div class="name-row">
+            <input class="input flex1" type="text" id="filename" placeholder="output" autocomplete="off" autocorrect="off" spellcheck="false">
+            <select class="select select-sm" id="fmt-select">
+              <option value="png">PNG</option>
+              <option value="jpeg">JPG</option>
+            </select>
+          </div>
+        </div>
+
+      </section>
+
+      <hr class="divider">
+
+      <!-- ── Run ── -->
+      <section class="section run-section">
+        <button class="btn btn-run" id="run-btn">Run</button>
+      </section>
+
+      <!-- Progress bar -->
+      <div class="progress-wrap hidden" id="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-label" id="progress-label">Processing…</p>
+      </div>
+
+      <!-- ── Result ── -->
+      <section class="section result-section hidden" id="result-section">
+        <div class="result-header">
+          <span class="result-info" id="result-info">0 images</span>
+          <button class="btn btn-download" id="download-btn">⬇ Download</button>
+        </div>
+        <div class="result-grid" id="result-grid"></div>
+      </section>
+
+    </div><!-- /card -->
+  </main>
+
+  <!-- JSZip for multi-file downloads -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

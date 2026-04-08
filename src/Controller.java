@@ -273,10 +273,10 @@ public class Controller implements Initializable {
 
         // Sets the last action option
         if (actionOption.equalsIgnoreCase("VERTICAL")) {
-            vertical.isSelected();
+            vertical.setSelected(true);
         }
         else if (actionOption.equalsIgnoreCase("HORIZONTAL")) {
-            horizontal.isSelected();
+            horizontal.setSelected(true);
         }
 
         // Sets the last file option
@@ -316,11 +316,7 @@ public class Controller implements Initializable {
             inputField.setText("");
             nameField.setText("");
 
-            inputImagesBTN.setText("Import Image");
-            inputFolderBTN.setVisible(false);
-            inputImagesBTN.setPrefWidth(220);
-            inputImagesBTN.setTranslateX(310);
-            inputImagesBTN.setTranslateY(-50);
+            setStitchMode(false);
         }
 
         // Changing from splitting to stitching
@@ -329,11 +325,7 @@ public class Controller implements Initializable {
             inputField.setText("");
             nameField.setText("");
 
-            inputImagesBTN.setText("Import Images");
-            inputFolderBTN.setVisible(true);
-            inputImagesBTN.setPrefWidth(100.0);
-            inputImagesBTN.setTranslateX(0);
-            inputImagesBTN.setTranslateY(0);
+            setStitchMode(true);
 
             if (stitchSplit.isSelected()) {
                 stitchSplitOptions.setDisable(false);
@@ -343,42 +335,25 @@ public class Controller implements Initializable {
         // No image has been selected yet
         else {
             if (stitchSplit.isSelected()) {
-                inputImagesBTN.setText("Import Images");
-                inputFolderBTN.setVisible(true);
-                inputImagesBTN.setPrefWidth(100.0);
-                inputImagesBTN.setTranslateX(0);
-                inputImagesBTN.setTranslateY(0);
+                setStitchMode(true);
                 vertical.setDisable(true);
                 horizontal.setDisable(true);
                 stitchSplitOptions.setDisable(false);
             }
             else if (stitch.isSelected()) {
-                inputImagesBTN.setText("Import Images");
-                inputFolderBTN.setVisible(true);
-                inputImagesBTN.setPrefWidth(100.0);
-                inputImagesBTN.setTranslateX(0);
-                inputImagesBTN.setTranslateY(0);
+                setStitchMode(true);
                 vertical.setDisable(false);
                 horizontal.setDisable(false);
                 stitchSplitOptions.setDisable(true);
-
             }
             else if (split.isSelected()) {
-                inputImagesBTN.setText("Import Image");
-                inputFolderBTN.setVisible(false);
-                inputImagesBTN.setPrefWidth(220);
-                inputImagesBTN.setTranslateX(330);
-                inputImagesBTN.setTranslateY(-50);
+                setStitchMode(false);
                 vertical.setDisable(false);
                 horizontal.setDisable(false);
                 stitchSplitOptions.setDisable(true);
             }
             else if (smartSplit.isSelected()) {
-                inputImagesBTN.setText("Import Image");
-                inputFolderBTN.setVisible(false);
-                inputImagesBTN.setPrefWidth(220);
-                inputImagesBTN.setTranslateX(330);
-                inputImagesBTN.setTranslateY(-50);
+                setStitchMode(false);
                 vertical.setDisable(true);
                 horizontal.setDisable(true);
                 stitchSplitOptions.setDisable(true);
@@ -386,6 +361,25 @@ public class Controller implements Initializable {
         }
 
         onScale();
+    }
+
+    // Configures input row for stitch mode (multiple images) or split mode (single image)
+    private void setStitchMode(boolean stitching) {
+        if (stitching) {
+            inputImagesBTN.setText("Import Images");
+            inputFolderBTN.setVisible(true);
+            inputFolderBTN.setManaged(true);
+            inputField.setVisible(true);
+            inputField.setManaged(true);
+            inputImagesBTN.setPrefWidth(100.0);
+        } else {
+            inputImagesBTN.setText("Import Image");
+            inputFolderBTN.setVisible(false);
+            inputFolderBTN.setManaged(false);
+            inputField.setVisible(false);
+            inputField.setManaged(false);
+            inputImagesBTN.setPrefWidth(220.0);
+        }
     }
 
     // ImportFolder button pressed
@@ -970,7 +964,7 @@ public class Controller implements Initializable {
             a.setHeaderText(null);
             a.setContentText("Continue with these splits?");
             a.showAndWait();
-            if (a.getResult().getText().equalsIgnoreCase("OK")) {
+            if (a.getResult() != null && a.getResult().getText().equalsIgnoreCase("OK")) {
                 break;
             }
         }
@@ -1186,7 +1180,7 @@ public class Controller implements Initializable {
 
         // If shf and swf are not numbers and scale is 1
         if (!shf.isEmpty() && !swf.isEmpty() && sf == 1) {
-            if (Util.isNumber(shf) || Util.isNumber(swf)) {
+            if (!Util.isNumber(shf) || !Util.isNumber(swf)) {
                 scaleSlider.setValue(1);
                 scaleWidthField.clear();
                 scaleHeightField.clear();
@@ -1222,7 +1216,11 @@ public class Controller implements Initializable {
 
         // Create command argument
         ArrayList<String> cmd = new ArrayList<>();
-        cmd.add(waifuField.getText().substring(0, waifuField.getLength()-1));
+        String waifuExe = waifuField.getText();
+        if (waifuExe.endsWith(File.separator) || waifuExe.endsWith("/") || waifuExe.endsWith("\\")) {
+            waifuExe = waifuExe.substring(0, waifuExe.length() - 1);
+        }
+        cmd.add(waifuExe);
         cmd.add("-i");
         cmd.add("\"" + f.getAbsolutePath() + "\"");
         cmd.add("-o");

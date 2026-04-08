@@ -1,0 +1,566 @@
+/* ─── Reset & Base ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #191919;
+  --bg2:       #222222;
+  --bg3:       #2a2a2a;
+  --border:    #333333;
+  --text:      #ffffff;
+  --text-dim:  #a9a9a9;
+
+  --teal:      #1abc9c;
+  --blue:      #3498db;
+  --red:       #e74c3c;
+  --purple:    #a29bfe;
+  --yellow:    #f1c40f;
+  --pink:      #fd79a8;
+  --cyan:      #81ecec;
+  --grad-run:  linear-gradient(135deg, #ff7f50, #6a5acd);
+  --grad-title:linear-gradient(135deg, #12d6df, #f70fff);
+
+  --radius:    10px;
+  --radius-lg: 16px;
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+
+  --tap: 48px; /* minimum tap target */
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  min-height: 100dvh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+.app-header {
+  text-align: center;
+  padding: 24px 16px 12px;
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-title {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 200;
+  letter-spacing: 0.05em;
+  background: var(--grad-title);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heart {
+  -webkit-text-fill-color: white;
+}
+
+.app-sub {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+/* ─── Layout ────────────────────────────────────────────────── */
+.app-main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 0 40px;
+}
+
+.card {
+  margin: 0 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.section {
+  padding: 16px;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Tabs ──────────────────────────────────────────────────── */
+.tabs-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 12px 12px 8px;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.tab {
+  flex: 1;
+  min-width: 80px;
+  height: var(--tap);
+  padding: 0 14px;
+  background: var(--bg3);
+  color: var(--text-dim);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tab:active { opacity: 0.7; }
+
+.tab.active {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 1px var(--cyan);
+}
+
+/* ─── Drop Zone ─────────────────────────────────────────────── */
+.drop-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 140px;
+  padding: 24px 16px;
+  border: 2px dashed var(--blue);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.drop-zone.drag-over {
+  background: rgba(52, 152, 219, 0.1);
+  border-color: var(--teal);
+}
+
+.drop-zone:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(26,188,156,0.3);
+}
+
+.drop-zone input[type=file] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  font-size: 0; /* prevents iOS zoom */
+}
+
+.drop-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--blue);
+  flex-shrink: 0;
+}
+
+.drop-primary {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.drop-secondary {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ─── Watermark import row ──────────────────────────────────── */
+.wm-import {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.file-badge {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+/* ─── File list ─────────────────────────────────────────────── */
+.file-list {
+  list-style: none;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.file-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+}
+
+.file-size {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.file-remove {
+  background: none;
+  border: none;
+  color: var(--red);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Settings ──────────────────────────────────────────────── */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.setting-label {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.two-col .setting-label {
+  min-width: unset;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ─── Toggle group ──────────────────────────────────────────── */
+.toggle-group {
+  display: flex;
+  gap: 6px;
+}
+
+.toggle {
+  height: var(--tap);
+  padding: 0 18px;
+  background: var(--bg3);
+  color: var(--text-dim);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggle.active {
+  background: var(--bg);
+  color: var(--text);
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 1px var(--cyan);
+}
+
+/* ─── Form controls ─────────────────────────────────────────── */
+.input {
+  height: var(--tap);
+  padding: 0 14px;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1.5px solid var(--blue);
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.input:focus { border-color: var(--teal); }
+.input::placeholder { color: var(--text-dim); }
+
+.input-sm {
+  height: 40px;
+  padding: 0 10px;
+}
+
+.select {
+  height: var(--tap);
+  padding: 0 10px;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.select-sm {
+  height: 40px;
+}
+
+/* Range slider */
+.range {
+  flex: 1;
+  accent-color: var(--teal);
+  height: 4px;
+  cursor: pointer;
+}
+
+/* Checkbox */
+.check-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--yellow);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Name row */
+.name-row {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.flex1 { flex: 1; min-width: 0; }
+
+/* ─── Buttons ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--tap);
+  padding: 0 20px;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid transparent;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.97); opacity: 0.85; }
+
+.btn-run {
+  width: 100%;
+  height: 52px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  background: var(--grad-run);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(106,90,205,0.3);
+}
+
+.btn-run:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-outline {
+  background: none;
+  border-color: var(--pink);
+  color: var(--pink);
+}
+
+.btn-outline:hover { background: rgba(253,121,168,0.1); }
+
+.btn-download {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+  font-size: 0.9rem;
+  padding: 0 16px;
+  height: 40px;
+}
+
+.btn-download:hover { background: #17a589; }
+
+.run-section { padding-top: 8px; }
+
+/* ─── Progress ──────────────────────────────────────────────── */
+.progress-wrap {
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.progress-track {
+  height: 4px;
+  background: var(--bg3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--grad-run);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.3s;
+}
+
+.progress-label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+}
+
+/* ─── Result ────────────────────────────────────────────────── */
+.result-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.result-info {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.result-thumb-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg3);
+  cursor: pointer;
+  border: 1px solid var(--border);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-thumb-wrap:hover { border-color: var(--teal); }
+
+.result-thumb {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.result-thumb-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 0.7rem;
+  text-align: center;
+  padding: 3px 4px;
+}
+
+/* ─── Utilities ─────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ─── Responsive tweaks ─────────────────────────────────────── */
+@media (max-width: 400px) {
+  .toggle { padding: 0 12px; font-size: 0.8rem; }
+  .tab { min-width: 70px; font-size: 0.78rem; }
+  .setting-label { min-width: 60px; }
+}
+
+@media (min-width: 500px) {
+  .result-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .card { margin: 0 16px; }
+}
+
+@media (min-width: 680px) {
+  .tabs-wrap { padding: 16px 16px 10px; }
+  .section { padding: 20px; }
+  .card { margin: 0; }
+  .app-main { padding: 0 16px 40px; }
+}

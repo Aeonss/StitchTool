@@ -29,6 +29,8 @@ public class Stitch extends Application {
 
         window.setTitle("Stitch Tool v" + version + " by Aeon");
         window.setResizable(true);
+        window.setMinWidth(550);
+        window.setMinHeight(700);
         window.setScene(scene);
         window.getIcons().add(new Image(String.valueOf(getClass().getClassLoader().getResource("icon.png"))));
         window.show();
@@ -59,17 +61,17 @@ public class Stitch extends Application {
         in.close();
 
         // Parses the API to find the latest tag version
-        double latestVersion = Double.parseDouble(response.substring(response.toString().indexOf("tag_name") + 11,
-                response.toString().indexOf(",", response.toString().indexOf("tag_name")) - 1));
+        String latestVersion = response.substring(response.toString().indexOf("tag_name") + 11,
+                response.toString().indexOf(",", response.toString().indexOf("tag_name")) - 1).trim();
 
         // If an updated version is found, notifies the user
-        if (Double.parseDouble(version) < latestVersion) {
+        if (isNewerVersion(version, latestVersion)) {
             Alert a = new Alert(Alert.AlertType.CONFIRMATION);
             a.setHeaderText(null);
             a.setTitle("Update Available!");
             a.setContentText("A new version of StitchTool v" + latestVersion + " is available for download. \nWould you like to visit the website to download it?");
             a.showAndWait();
-            if (a.getResult().getText().equals("OK")) {
+            if (a.getResult() != null && a.getResult().getText().equals("OK")) {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     try {
                         Desktop.getDesktop().browse(new URI("https://github.com/Aeonss/StitchTool/releases/latest"));
@@ -112,5 +114,19 @@ public class Stitch extends Application {
 
         p.store(o, null);
         o.close();
+    }
+
+    // Compares two version strings (e.g. "4.0.6" vs "4.1.0"); returns true if latest > current
+    private boolean isNewerVersion(String current, String latest) {
+        String[] c = current.split("\\.");
+        String[] l = latest.split("\\.");
+        int len = Math.max(c.length, l.length);
+        for (int i = 0; i < len; i++) {
+            int cv = i < c.length ? Integer.parseInt(c[i]) : 0;
+            int lv = i < l.length ? Integer.parseInt(l[i]) : 0;
+            if (lv > cv) return true;
+            if (lv < cv) return false;
+        }
+        return false;
     }
 }
